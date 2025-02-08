@@ -1,0 +1,137 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", serif;
+    background-color: #f6f5f4;
+    font-size: 20px;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+h1{
+    text-align: center;
+    padding: 20px;
+}
+h2{
+    padding-bottom: 5px;
+}
+hr{
+    margin-bottom: 20px;
+}
+.back-button{
+    margin: 0 20px;
+    cursor: pointer;
+}
+form{
+    width: 70%;
+    margin: auto;
+    padding: 50px;
+    border: 2px solid rgba(0, 0, 0, 0.207);
+    border-radius: 10px;
+    margin-bottom: 50px;
+}
+.form-image{
+    width: 300px;
+    height: 300px;
+    float: right;
+}
+input, select{
+    font-size: 20px;
+    padding: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.43);
+}
+textarea{
+    font-size: 20px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px dashed rgba(0, 0, 0, 0.348);
+}
+.top-left-form{
+    width: 77%;
+    margin-top: 40px;
+}
+.top-left-form , .top-left-form-label{
+    width: 77%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.desc-textarea{
+    width: 77%;
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.material-textarea{
+    width: 93.5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.dimetions{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.dimetions > .inner-dimentions{
+    padding: 0 10px;
+}
+.inner-dimentions > input{
+    margin-top: 20px;
+}
+.capacity{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.capacity, .inner-capacity{
+    margin-top: 10px;
+}
+.inner-capacity > input{
+    margin-top: 20px;
+}
+.type{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+}
+.type, .inner-type{
+    margin-top: 10px;
+}
+.inner-type > input{
+    margin-top: 20px;
+}
+.image{
+    text-align: center;
+}
+.image > input{
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+.form-btn > .btn{
+    cursor: pointer;
+    padding: 20px 40px;
+}
+.btn{
+    display: flex;
+    margin: auto;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.343);
+}
+.btn:hover{
+    background-color: rgba(0, 0, 0, 0.24);
+}
+input, textarea, select{
+    border-radius: 5px;
+}
