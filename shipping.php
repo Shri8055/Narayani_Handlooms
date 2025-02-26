@@ -1,27 +1,5 @@
 <?php
-session_start();
-$conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-$cart_count = 0;
-
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-    $cart_count_query = "SELECT SUM(quantity) AS total FROM cart WHERE user_id = $user_id";
-    $cart_count_result = mysqli_query($conn, $cart_count_query);
-
-    if ($cart_count_result) {
-        $cart_count_row = mysqli_fetch_assoc($cart_count_result);
-        $cart_count = $cart_count_row['total'] ?? 0;
-    }
-} elseif (isset($_SESSION['cart'])) {
-    // Count the total items in session cart for guest users
-    foreach ($_SESSION['cart'] as $item) {
-        $cart_count += $item['quantity'];
-    }
-}
+  session_start();
 ?>
 <!DOCTYPE html>
 <html>
@@ -31,7 +9,7 @@ if (isset($_SESSION['user_id'])) {
         <title>Narayani Handlooms</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="index.css">
+        <link rel="stylesheet" type="text/css" href="shipping.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -93,130 +71,35 @@ if (isset($_SESSION['user_id'])) {
           <img src="images/Narayani.png" alt="logo" class="logo-img">
           <div class="right-inner-sec1-container">
               <a href="#"><i class="fa-solid fa-magnifying-glass" data-tooltip="Search"></i></a>
-              <a href="cart_page.php">
-                <i class="fa-solid fa-bag-shopping" data-tooltip="Cart"></i>
-                <span class="cart-value"><?php echo $cart_count; ?></span>
-              </a>
+              <a href="#"><i class="fa-solid fa-bag-shopping" data-tooltip="Cart"></i><span class="cart-value">0</span></a>
           </div>
         </section><hr>
         <section class="quick-links">
             <ul>
-                <li>HOME</li>
-                <li>SALE / OFFERS</li>
                 <li>BEST SELLER</li>
                 <li>SHOP BY CATAGORY</li>
                 <li>JEWELLERY</li>
-                <li>CUSTOMISED ORDER</li>
+                <li>EDITOR'S PACK</li>
                 <li>BULK ORDER</li>
+                <li>HOME</li>
                 <li>ABOUT US</li>
                 <li>CONTACT US</li>
+                <li>SALE</li>
             </ul>
-        </section>
-        <section class="slide-show">
-            <div class="slideshow-container">
-                <div class="mySlides fade">
-                  <div class="numbertext">1 / 3</div>
-                  <img src="images/5.jpg">
-                  <div class="text">
-                    <p class="slide-header">BEST SELLER</p>
-                    <p class="slide-des">EXPLORE OUR BEST SELLER !</p>
-                    <button>SHOP NOW</button>
-                  </div>
-                </div>
-                <div class="mySlides fade">
-                  <div class="numbertext">2 / 3</div>
-                  <img src="images/6.jpeg" style="width:100%">
-                  <div class="text">
-                    <p class="slide-header">NEW ARRIVAL</p>
-                    <p class="slide-des">NEW LAUNCHES BAG NAME !</p>
-                    <button>SHOP NOW</button>
-                  </div>
-                </div>
-                <div class="mySlides fade">
-                  <div class="numbertext">3 / 3</div>
-                  <img src="images/4.jpg" style="width:100%">
-                  <div class="text">
-                    <p class="slide-header">CUSTOMIZE ORDERS</p>
-                    <p class="slide-des">Customize orders in various ways !</p>
-                    <button>EXPLORE NOW</button>
-                  </div>
-                </div>
-                <a class="prev" onclick="plusSlides(-1)">❮</a>
-                <a class="next" onclick="plusSlides(1)">❯</a>
-                </div><br>
-                <div style="text-align:center">
-                  <span class="dot" onclick="currentSlide(1)"></span> 
-                  <span class="dot" onclick="currentSlide(2)"></span> 
-                  <span class="dot" onclick="currentSlide(3)"></span> 
-                </div>
-        </section><hr class="slide-hr">
-        <h4 class="collection-h4">FEATURED COLLECTION</h4>
-        <section class="collection">
-        <?php
-          $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
-          $result = mysqli_query($conn, "SELECT * FROM products WHERE product_type='Featured' LIMIT 8");
-          while ($row = mysqli_fetch_assoc($result)){
-              echo "<a href='product.php?id=" . $row['product_id'] . "' target='_blank' class='card-link'>";
-              echo "<div class='card'>";
-              echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
-              echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p>";
-              echo "</div></a>";
-          }
-        ?>
-        </section>
-        <button class="view-all-cards">VIEW ALL </button><hr>
-        <section class="gifting">
-          <div class="gifting-card">
-            <div class="gifting-text">
-              <h4>NARAYANI GIFTING</h4>
-              <p>Welcome to Narayani India, your go-to destination for unique, handlooms. Our collection features exquisite pieces made by skilled artisans who pour their passion and creativity into every item. Whether you're looking for a special gift for a loved one or a treat for yourself, you'll find a range of beautiful, one-of-a-kind products in our shop.</p>
-            </div>
-            <div class="gifting-img">
-              <img src="images/gift-bag.PNG" alt="">
-            </div>
-          </div>
-        </section><hr>
-        <h4 class="special-h4">SPECIAL HANDLOOMS COLLECTION !</h4>
-        <section class="special">
-        <?php
-          $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
-          $result = mysqli_query($conn, "SELECT * FROM products WHERE product_type='Special' LIMIT 4");
-          while ($row = mysqli_fetch_assoc($result)){
-              echo "<a href='product.php?id=" . $row['product_id'] . "' target='_blank' class='card-link'>";
-              $_SESSION['product_id']=$row['product_id'];
-              echo "<div class='card'>";
-              echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
-              echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p>";
-              echo "</div></a>";
-          }
-        ?>
-        </section>
-        <button class="view-all-cards">VIEW ALL </button><hr>
-        <h4 class="other-collection-h4">COLLECTOR ITEMS</h4>
-        <section class="other-collection">
-        <?php
-          $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
-          $result = mysqli_query($conn, "SELECT * FROM products WHERE product_type='Collector'");
-          while ($row = mysqli_fetch_assoc($result)){
-              echo "<a href='product.php?id=" . $row['product_id'] . "' target='_blank' class='card-link'>";
-              echo "<div class='card'>";
-              echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
-              echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p>";
-              echo "</div></a>";
-          }
-        ?>
-        </section>
-        <button class="view-all-cards">VIEW ALL </button><hr>
-        <section class="about-us">
-          <div class="about-us-container">
-            <h4>ABOUT US</h4>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore ullam atque quidem dolores omnis iusto obcaecati, maiores ratione nostrum. Repellat modi nihil labore voluptatem, dolore sunt ducimus beatae praesentium doloremque?</p><br>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni, sint ab rem quaerat, in dolorum repellat, quisquam veritatis enim mollitia molestias id harum quas expedita modi cumque reiciendis quod facilis.</p>
-          </div>
-        </section>
+        </section><hr><br>
+        
+        <div class="container">
+            <h1>Shipping Policy</h1><br>
+            <h4><u>Shipping Information</u></h4><br>
+            <p>Availability : We shipped Pan India.</p><br>
+            <p>Processing time : Allow 7-10 business days processing time for your order to be shipped.</p><br>
+            <h4><u>PLEASE NOTE: </u></h4>
+            <ul>It takes 7-10 business days for deliveries pan India, that's excluding our processing time. We hope for your kind patience and understanding in this matter.</ul>
+            <ul>All packages are shipped via Delhivery and Bluedart courier service.</ul><br>
+            <p>Once your order is shipped, we will notify you via Email or SMS.</p><br><br>
+            <p>To keep track on your order, please whatsapp us at +91 1234567890 or write to us at Narayani2025@gmail.com.</p><br><br>
+            <p>Thank you !</p><br>
+        </div>
         <footer>
           <section class="footer-container">
             <div class="footer-left-container">
@@ -281,7 +164,6 @@ if (isset($_SESSION['user_id'])) {
             $stmt->bind_param("sss", $user_name, $user_email, $hashed_password);
     
             if($stmt->execute()){
-                $_SESSION['user_id'] = $stmt->insert_id;
                 echo "User registered successfully!";
                 echo '<script>alert("User registered successfully!")</script>';
                 header("Location: home.php?success=1");
@@ -296,15 +178,14 @@ if (isset($_SESSION['user_id'])) {
       if(isset($_POST["login"])){
         $user_email=$_POST["email"];
         $user_pass=$_POST["password"];
-        $stmt=$conn->prepare("SELECT user_id, user_pass, user_name FROM users WHERE user_email=?");
+        $stmt=$conn->prepare("SELECT user_pass, user_name FROM users WHERE user_email=?");
         $stmt->bind_param("s", $user_email);
         $stmt->execute();
         $stmt->store_result();
         if($stmt->num_rows>0){
-          $stmt->bind_result($user_id, $hashed_password, $user_name);
+          $stmt->bind_result($hashed_password, $user_name);
           $stmt->fetch();
           if(password_verify($user_pass, $hashed_password)){
-            $_SESSION['user_id']=$user_id;
             $_SESSION['username']=$user_name;
             if($user_email==="Narayani2025@gmail.com"){
               $_SESSION['admin']=$user_email;

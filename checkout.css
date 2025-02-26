@@ -1,0 +1,152 @@
+body{
+    font-family: "Inter", serif;
+    margin: 20px;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+h1{
+    text-align: center;
+    font-size: 28px;
+    color: #333;
+}
+hr{
+    border: 0.5px solid #ddd;
+    margin: 10px 0;
+}
+form{
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    float: left;
+}
+.form{
+    width: 50%;
+    float: right;
+}
+.product-container { 
+    display: flex; 
+    align-items: start;
+    margin-bottom: 20px; 
+    
+}
+
+.form1{
+    width: 40%;
+}
+.form, .form1{
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+.product-container img { 
+    width: 100px; 
+    height: auto; 
+    margin-right: 20px; 
+}
+
+.product-details { 
+    font-size: 18px; 
+}
+label{
+    font-weight: 500;
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+#country{
+    width: 100%;
+}
+.first-name, .last-name{
+    width: 45.9%;
+}
+.region{
+    width: 29%;
+    display: inline-block;
+}
+.checkbox{
+    display: flex;
+    align-items: center;
+    margin-top: -10px;
+}
+.checkbox > input{
+    width: 30px;
+    margin-top: 10px;
+}
+input, select {
+    width: 96.5%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+input, select, label{
+    font-family: "Inter", serif;
+}
+input:focus, select:focus{
+    outline: none;
+    border-color: #007bff;
+}
+.contact-head, .country-head{
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.phone-container{
+    gap: 10px;
+    height: 13vh;
+}
+.phone-container .phone-code{
+    background: #007bff;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.phone-container select{
+    width: auto;
+    flex-grow: 1;
+}
+.phone-container input{
+    flex-grow: 2;
+}
+.payment{
+    margin-top: 20px;
+}
+.payment p{
+    font-size: 14px;
+    color: #666;
+}
+button{
+    background: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px;
+    width: 100%;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+button:hover{
+    background: #0056b3;
+}
+ul{
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+ul a{
+    text-decoration: none;
+    color: #007bff;
+    font-size: 14px;
+    margin: 5px;
+    display: inline-block;
+}
+ul a:hover{
+    text-decoration: underline;
+}

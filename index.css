@@ -1,8 +1,11 @@
-/* images resolution is and sholud be = 1140*655 */
+/* images resolution is and sholud be = 845*435 */
 *{
     margin: 0;
     padding: 0;
     font-family: "Inter", serif;
+}
+html {
+  scroll-behavior: smooth;
 }
 header{
     background-color: black;
@@ -41,6 +44,7 @@ header{
 .sec1-container a{
   position: relative;
   display: inline-block;
+  outline: none;
 }
 .sec1-container a i::after{
   content: attr(data-tooltip);
@@ -66,7 +70,7 @@ header{
 }
 
 .left-inner-sec1-container, .right-inner-sec1-container{
-  padding: 10px 0;;
+  padding: 10px 0;
 }
 .left-inner-sec1-container > a{
     padding: 10px 13px;
@@ -234,14 +238,25 @@ img {vertical-align: middle;}
   text-align: center;
   margin-top: 40px;
 }
+.special{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  margin: auto;
+}
 .card{
-  cursor: pointer;
+  max-width: 300px;
+  width: 100%;
   text-align: center;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
 }
 .card:hover{
   transform: scale(1.05);
@@ -251,6 +266,14 @@ img {vertical-align: middle;}
   width: 100%;
   height: auto;
   border-radius: 8px;
+}
+.card > p{
+  padding: 10px 0;
+  color: black;
+}
+.card-link{
+  text-decoration: none;
+  color: inherit;
 }
 .bag-name{
   font-size: 1.2rem;
@@ -510,9 +533,8 @@ input{
     width: 80%;
   }
 }
-
-/* Popup styling */
-.popup {
+/* POP-UP */
+.popup{
   display: none;
   position: fixed;
   margin: auto;
@@ -524,34 +546,56 @@ input{
 h2{
   background-color: white;
 }
-.popup-content {
+.popup-content{
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  width: 350px;
+  width: 800px;
   text-align: center;
-  position: fixed; /* Ensure it's positioned relative to the viewport */
+  position: fixed; 
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Center horizontally and vertically */
+  transform: translate(-50%, -50%);
 }
-
-.close {
+label > i{
+  padding-right: 10px;
+}
+.popup-content > img{
+  width: 350px;
+  height: 350px;
+}
+.popup-image .inner-popup-content{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.inner-popup-content{
+  width: 350px;
+  float: right;
+  margin-right: 30px;
+}
+.forgot-pass{
+  margin: 10px 0 0 15px;
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+  float: left;
+  border-bottom: 1px solid black;
+}
+.close{
   position: absolute;
   top: 10px;
   right: 15px;
   font-size: 20px;
   cursor: pointer;
 }
-
-.tabs {
+.tabs{
   display: flex;
   justify-content: center;
   margin-top: 25px;
   margin-bottom: 15px;
 }
-
-.tablinks {
+.tablinks{
   padding: 10px 20px;
   cursor: pointer;
   border: none;
@@ -559,17 +603,14 @@ h2{
   margin: 0 5px;
   border-radius: 5px;
 }
-
-.tablinks.active {
+.tablinks.active{
   background: #007BFF;
   color: white;
 }
-
-.tabcontent {
+.tabcontent{
   display: none;
 }
-
-.tabcontent.active {
+.tabcontent.active{
   display: block;
 }
 form{
@@ -589,7 +630,7 @@ form input {
   border-radius: 5px;
 }
 
-form button {
+form .login-btn {
   width: 100%;
   padding: 10px;
   background: #007BFF;
@@ -597,6 +638,17 @@ form button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-top: 10px;
+}
+form .sign-btn {
+  width: 100%;
+  padding: 10px;
+  background: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
 }
 
 form button:hover {

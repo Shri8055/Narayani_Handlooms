@@ -1,0 +1,237 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+$items = [];
+$total_amount = 0;
+
+// Handle Buy Now functionality
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
+    $_SESSION['checkout_mode'] = 'buy_now';
+    $_SESSION['buy_now_product'] = [
+        'id' => (int)$_POST['product_id'],
+        'name' => $_POST['name'],
+        'price' => (float)$_POST['price'],
+        'image' => $_POST['product_image'], // Image may be a path or a database field
+        'quantity' => (int)$_POST['quantity'],
+    ];
+    header("Location: checkout.php");
+    exit();
+}
+
+// Fetch products based on checkout mode
+if (isset($_SESSION['checkout_mode']) && $_SESSION['checkout_mode'] == 'buy_now' && isset($_SESSION['buy_now_product'])) {
+    $items[] = $_SESSION['buy_now_product']; // Show only the Buy Now product
+} else {
+    // Fetch cart items along with image data from the database
+    $query = "SELECT cart.*, products.product_name AS name, 
+                 products.product_price AS price, 
+                 cart.product_image 
+          FROM cart 
+          JOIN products ON cart.product_id = products.product_id
+          WHERE cart.user_id = ?";
+          
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+while ($row = mysqli_fetch_assoc($result)) {
+    $items[] = [
+        'id' => $row['product_id'],
+        'name' => $row['name'],
+        'price' => $row['price'],
+        'image' => $row['product_image'], // Use correct column name
+        'quantity' => $row['quantity'],
+    ];
+}
+}
+
+// Calculate total amount
+foreach ($items as $item) {
+    $total_amount += $item['price'] * $item['quantity'];
+}
+
+// Handle Order Placement
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
+    // Store order in database
+    $order_details = json_encode($items);
+    $query = "INSERT INTO orders (user_id, order_details, total_amount, order_date) 
+              VALUES (?, ?, ?, NOW())";
+    
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "isd", $user_id, $order_details, $total_amount);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        // Clear cart or Buy Now session after successful order
+        if ($_SESSION['checkout_mode'] == 'buy_now') {
+            unset($_SESSION['buy_now_product']);
+            unset($_SESSION['checkout_mode']);
+        } else {
+            $delete_query = "DELETE FROM cart WHERE user_id = ?";
+            $delete_stmt = mysqli_prepare($conn, $delete_query);
+            mysqli_stmt_bind_param($delete_stmt, "i", $user_id);
+            mysqli_stmt_execute($delete_stmt);
+        }
+        
+        $_SESSION['success_message'] = "Order placed successfully!";
+        header("Location: order_success.php");
+        exit();
+    } else {
+        $_SESSION['error_message'] = "Failed to place order. Please try again.";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="checkout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 20px; }
+        .product-container { display: flex; align-items: center; margin-bottom: 20px; }
+        .product-container img { width: 100px; height: auto; margin-right: 20px; }
+        .product-details { font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h1>Narayani Handlooms</h1><hr>
+    <div class="form1">
+    <?php if (!empty($items)): ?>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Image</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+            <?php foreach ($items as $item): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($item['name']); ?></td>
+                    <td>
+                        <?php if (!empty($item['image'])): ?>
+                            <img src="data:image/jpg;base64,<?php echo base64_encode($item['image']); ?>" width="50">
+                        <?php else: ?>
+                            <img src="default.jpg" width="50">
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo number_format($item['price'], 2); ?></td>
+                    <td><?php echo $item['quantity']; ?></td>
+                    <td><?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+        <h3>Total Amount: $<?php echo number_format($total_amount, 2); ?></h3>
+        
+    <?php else: ?>
+        <p>Your cart is empty.</p>
+    <?php endif; ?>
+    </div>
+</body>
+</html>
+
+
+// cart_page
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    die("<h2>Please log in to view your cart.</h2>");
+}
+$conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+$user_id = $_SESSION['user_id'];
+$cart_items = [];
+$total_price = 0;
+$db_cart_query = "SELECT * FROM cart WHERE user_id = $user_id";
+$db_cart_result = mysqli_query($conn, $db_cart_query);
+if ($db_cart_result) {
+    while ($db_cart_item = mysqli_fetch_assoc($db_cart_result)) {
+        $cart_items[$db_cart_item['product_id']] = [
+            'name' => $db_cart_item['product_name'],
+            'price' => $db_cart_item['product_price'],
+            'image' => $db_cart_item['product_image'],
+            'quantity' => $db_cart_item['quantity']
+        ];
+        $total_price += $db_cart_item['product_price'] * $db_cart_item['quantity'];
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="cart_page.css">
+    <script>
+        function updateQuantity(productId, action) {
+            fetch(`update_cart.php?id=${productId}&action=${action}`, { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert("Error updating quantity!");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="cart-header">
+        <h1>Your Cart</h1>
+        <span class="cart-total"><b>Total: ₹<?= number_format($total_price, 2) ?></b></span>
+    </div>
+    <div class="conti-shop">
+        <a href="home.php"><p>Continue shopping</p></a>
+    </div>
+    <?php if (empty($cart_items)) : ?>
+        <h2 style="text-align:center; color:#555;">Your cart is empty.</h2>
+    <?php else : ?>
+    <table>
+        <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Remove</th>
+        </tr>
+        <?php foreach ($cart_items as $id => $product) : ?>
+        <tr>
+            <td><img src="<?php echo $product['image']; ?>" width="50"></td>
+            <td><?= htmlspecialchars($product['name']) ?></td>
+            <td>₹<?= number_format($product['price'], 2) ?></td>
+            <td>
+                <button class="btn btn-decrease" onclick="updateQuantity(<?= $id ?>, 'decrease')">−</button>
+                <?= $product['quantity'] ?>
+                <button class="btn btn-increase" onclick="updateQuantity(<?= $id ?>, 'increase')">+</button>
+            </td>
+            <td><a href="remove_from_cart.php?id=<?= $id ?>" class="btn-remove">Remove</a></td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+    <span class="cart-total-f">Total: ₹<?= number_format($total_price, 2) ?></span>
+    <a href="checkout.php" class="checkout-btn">Proceed to Checkout</a>
+    <?php endif; ?>
+</div>
+</body>
+</html>
