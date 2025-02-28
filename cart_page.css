@@ -34,8 +34,14 @@ body{
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
-.conti-shop, p{
+.conti-shop{
+    margin-top: 5px;
+}
+.conti-shop-span{
     color: black;
+    padding: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.317);
+    border-radius: 6px;
 }
 h1 {
     text-align: center;

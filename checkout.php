@@ -5,7 +5,6 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {
     echo "<script>
             alert('Please Sign-in / Log-in to proceed.');
@@ -16,7 +15,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// If user clicks "Buy Now"
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
     $_SESSION['checkout_mode'] = 'buy_now'; // Set checkout mode to "buy now"
     $_SESSION['buy_now_product'] = [
@@ -29,18 +27,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
     header("Location: checkout.php");
     exit();
 }
-
-// If user comes from the cart page
+$total_price=0;
 if (!isset($_SESSION['checkout_mode']) || $_SESSION['checkout_mode'] == 'cart') {
     $_SESSION['checkout_mode'] = 'cart';
 }
-// Get products for checkout
 $items = [];
 if ($_SESSION['checkout_mode'] == 'buy_now' && isset($_SESSION['buy_now_product'])) {
-    // Display only the "Buy Now" product
     $items[] = $_SESSION['buy_now_product'];
 } else {
-    // Display all cart items
     $query = "SELECT cart.*, products.product_name AS name, products.product_image AS image, products.product_price AS price
           FROM cart 
           JOIN products ON cart.product_id = products.product_id 
@@ -53,15 +47,14 @@ if ($_SESSION['checkout_mode'] == 'buy_now' && isset($_SESSION['buy_now_product'
             'image' => $row['image'],
             'quantity' => $row['quantity'],
         ];
+        $total_price += $row['product_price'] * $row['quantity'];
     }
 }
 
-// Handle placing the order
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
     if ($_SESSION['checkout_mode'] == 'buy_now') {
-        unset($_SESSION['buy_now_product']); // Remove "Buy Now" product after checkout
+        unset($_SESSION['buy_now_product']);
     } else {
-        // Clear the cart after checkout
         $delete_cart_query = "DELETE FROM cart WHERE user_id = " . $_SESSION['user_id'];
         mysqli_query($conn, $delete_cart_query);
     }
@@ -72,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
 
 //
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
-    $_SESSION['checkout_mode'] = 'buy_now'; // Set checkout mode to "buy now"
+    $_SESSION['checkout_mode'] = 'buy_now';
     $_SESSION['buy_now_product'] = [
         'id' => $_POST['product_id'] ?? 0,
         'name' => $_POST['name'] ?? 'Unknown Product',
@@ -270,6 +263,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
                         <option value="ZAF +27">South Africa (+27)</option>
                         <option value="ZMB +260">Zambia (+260)</option>
                         <option value="ZWE +263">Zimbabwe (+263)</option>
+                        
                 </select>
                 <input type="text" id="phone-input" placeholder="Phone number, If needed to contact about order" required>
             </div>
@@ -281,7 +275,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
                 <label>Payment</label>
                 <p>All transactions are secure and encrypted</p>
             </div>
-            <button>Pay Now</button><hr>
+            <button>Total: ₹<?= number_format($total_price, 2) ?> , Pay Now</button><hr>
             <ul>
                 <a href="#"><li>Refund Policy</li></a>
                 <a href="#"><li>Shipping Policy</li></a>
@@ -299,3 +293,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
         }
     </script>
     </div>
+    <div class="form">
+        <div class="cart-items">
+            <h1>Cart-items</h1><hr class="cart-items-hr">
+            <?php if (empty($items)): ?>
+                <h3>Your cart is empty. <a href="home.php">Go Shopping</a></h3>
+            <?php else: ?>
+            <table>
+                <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                </tr>
+                <?php foreach ($items as $item): ?>
+                <tr>
+                    <td><img src="<?= htmlspecialchars($item['image']) ?>" width="50"></td>
+                    <td><?= htmlspecialchars($item['name']) ?></td>
+                    <td>₹<?= number_format($item['price'], 2) ?></td>
+                    <td><?= $item['quantity'] ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </table><hr class="cart-items-hr">
+            <h3>Total: ₹<?= number_format($total_price, 2) ?></h3>
+            <?php endif; ?>
+        </div>
+    </form>
+</body>
+</html>
+

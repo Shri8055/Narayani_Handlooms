@@ -250,7 +250,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
             <input type="hidden" name="quantity" value="1"> 
             <button type="submit" name="buy_now">Buy Now</button>
         </form>
-
         <!-- "Add to Cart" will remain inside the original form -->
         <button type="submit" name="add_to_cart" class="add-to-cart">Add to Cart <i class="fa-solid fa-cart-shopping"></i></button>
     </div>

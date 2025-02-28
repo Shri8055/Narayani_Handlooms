@@ -56,7 +56,7 @@ if ($db_cart_result) {
         <span class="cart-total"><b>Total: ₹<?= number_format($total_price, 2) ?></b></span>
     </div>
     <div class="conti-shop">
-        <a href="home.php"><p>Continue shopping</p></a>
+        <a href="home.php"><span class="conti-shop-span">Continue shopping</span></a>
     </div>
     <?php if (empty($cart_items)) : ?>
         <h2 style="text-align:center; color:#555;">Your cart is empty.</h2>

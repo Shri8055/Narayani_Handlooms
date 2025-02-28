@@ -101,15 +101,26 @@ if (isset($_SESSION['user_id'])) {
         </section><hr>
         <section class="quick-links">
             <ul>
-                <li>HOME</li>
-                <li>SALE / OFFERS</li>
-                <li>BEST SELLER</li>
-                <li>SHOP BY CATAGORY</li>
-                <li>JEWELLERY</li>
-                <li>CUSTOMISED ORDER</li>
-                <li>BULK ORDER</li>
-                <li>ABOUT US</li>
-                <li>CONTACT US</li>
+                <a href="home.php"><li>HOME</li></a>
+                <a href="sale.php"><li>SALE / OFFERS</li></a>
+                <a href="best_sellers.php"><li>BEST SELLER</li></a>
+                <li id="category-toggle">SHOP BY CATEGORY ▼
+                    <ul class="dropdown">
+                        <a href="bags.php"><li>BAGS</li></a><hr>
+                        <a href="bags.php"><li>MEN</li></a><hr>
+                        <a href="bags.php"><li>WOMEN</li></a><hr>
+                        <a href="bags.php"><li>MEN & WOMEN</li></a><hr>
+                        <a href="accessories.php"><li>ACCESSORIES</li></a><hr>
+                        <a href="accessories.php"><li>JEWELLERY</li></a><hr>
+                        <a href="decor.php"><li>DECOR ITEMS</li></a><hr>
+                        <a href="clothing.php"><li>GIFT HAMPERS</li></a>
+                    </ul>
+                </li>
+                <a href="jewellery.php"><li>JEWELLERY</li></a>
+                <a href="custom_order.php"><li>CUSTOMISED ORDER</li></a>
+                <a href="bulk_order.php"><li>BULK ORDER</li></a>
+                <a href="#about-us"><li>ABOUT US</li></a>
+                <a href="contact.php"><li>CONTACT US</li></a>
             </ul>
         </section>
         <section class="slide-show">
@@ -210,7 +221,7 @@ if (isset($_SESSION['user_id'])) {
         ?>
         </section>
         <button class="view-all-cards">VIEW ALL </button><hr>
-        <section class="about-us">
+        <section class="about-us" id="about-us">
           <div class="about-us-container">
             <h4>ABOUT US</h4>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore ullam atque quidem dolores omnis iusto obcaecati, maiores ratione nostrum. Repellat modi nihil labore voluptatem, dolore sunt ducimus beatae praesentium doloremque?</p><br>

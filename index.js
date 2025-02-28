@@ -53,3 +53,12 @@ function openTab(evt, tabName) {
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " active";
 }
+
+// dropdown
+document.addEventListener("DOMContentLoaded", function () {
+  const categoryToggle = document.getElementById("category-toggle");
+
+  categoryToggle.addEventListener("click", function () {
+      this.classList.toggle("active");
+  });
+});
