@@ -49,7 +49,8 @@
               echo "<div class='card' onclick=\"window.open('admin_products.php?id=" . $row['product_id'] . "', '_blank')\">";
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
               echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p><hr>";
+              echo "<p>MRP : ₹ " . $row['ori_price'] . "</p>";
+              echo "<p>SP : ₹ " . $row['product_price'] . "</p><hr>";
               echo "<button>EDIT 📝</button>";
               echo "<button>DELETE ❌</button>";
               echo "</div></a>";
@@ -66,7 +67,8 @@
               echo "<div class='card' onclick=\"window.open('admin_products.php?id=" . $row['product_id'] . "', '_blank')\">";
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
               echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p><hr>";
+              echo "<p>MRP : ₹ " . $row['ori_price'] . "</p>";
+              echo "<p>SP : ₹ " . $row['product_price'] . "</p><hr>";
               echo "<button>EDIT 📝</button>";
               echo "<button>DELETE ❌</button>";
               echo "</div></a>";
@@ -83,7 +85,8 @@
               echo "<div class='card' onclick=\"window.open('admin_products.php?id=" . $row['product_id'] . "', '_blank')\">";
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
               echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p><hr>";
+              echo "<p>MRP : ₹ " . $row['ori_price'] . "</p>";
+              echo "<p>SP : ₹ " . $row['product_price'] . "</p><hr>";
               echo "<button>EDIT 📝</button>";
               echo "<button>DELETE ❌</button>";
               echo "</div></a>";

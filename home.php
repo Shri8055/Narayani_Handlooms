@@ -171,7 +171,8 @@ if (isset($_SESSION['user_id'])) {
               echo "<div class='card'>";
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
               echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p>";
+              echo "<p>MRP: ₹ " . $row['ori_price'] . "</p>";
+              echo "<p>Selling Price: ₹ " . $row['product_price'] . "</p>";
               echo "</div></a>";
           }
         ?>
@@ -199,7 +200,8 @@ if (isset($_SESSION['user_id'])) {
               echo "<div class='card'>";
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
               echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p>";
+              echo "<p>MRP: ₹ " . $row['ori_price'] . "</p>";
+              echo "<p>Selling Price: ₹ " . $row['product_price'] . "</p>";
               echo "</div></a>";
           }
         ?>
@@ -209,18 +211,43 @@ if (isset($_SESSION['user_id'])) {
         <section class="other-collection">
         <?php
           $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
-          $result = mysqli_query($conn, "SELECT * FROM products WHERE product_type='Collector'");
+          $result = mysqli_query($conn, "SELECT * FROM products WHERE product_type='Collector' LIMIT 4");
           while ($row = mysqli_fetch_assoc($result)){
               echo "<a href='product.php?id=" . $row['product_id'] . "' target='_blank' class='card-link'>";
               echo "<div class='card'>";
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
               echo "<p>" . $row['product_name'] . "</p>";
-              echo "<p>Price: ₹ " . $row['product_price'] . "</p>";
+              echo "<p>MRP: ₹ " . $row['ori_price'] . "</p>";
+              echo "<p>Selling Price: ₹ " . $row['product_price'] . "</p>";
               echo "</div></a>";
           }
         ?>
         </section>
         <button class="view-all-cards">VIEW ALL </button><hr>
+        <?php
+          $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
+          $dispQuery = mysqli_query($conn, "SELECT * FROM products WHERE genre='Accessories' OR genre='Decor Items' OR genre ='Gift Hampers'");
+          if (mysqli_num_rows($dispQuery) > 0) { 
+          ?>
+              <h4 class="other-collection-h4">Gift Hampers | Decor | Accessories</h4>
+              <section class="other-collection">
+              <?php
+                  $result = mysqli_query($conn, "SELECT * FROM products WHERE genre='Accessories' OR genre='Decor Items' OR genre ='Gift Hampers' LIMIT 4");
+                  while ($row = mysqli_fetch_assoc($result)){
+                      echo "<a href='product.php?id=" . $row['product_id'] . "' target='_blank' class='card-link'>";
+                      echo "<div class='card'>";
+                      echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
+                      echo "<p>" . $row['product_name'] . "</p>";
+                      echo "<p>MRP: ₹ " . $row['ori_price'] . "</p>";
+                      echo "<p>Selling Price: ₹ " . $row['product_price'] . "</p>";
+                      echo "</div></a>";
+                  }
+              ?>
+              </section>
+              <button class="view-all-cards">VIEW ALL</button><hr>
+          <?php
+          } 
+        ?>
         <section class="about-us" id="about-us">
           <div class="about-us-container">
             <h4>ABOUT US</h4>

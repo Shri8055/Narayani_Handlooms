@@ -37,6 +37,21 @@
                     <option value="Gift Bag">Gift bag</option>
                 </select><br><br>
             </div>
+            <div class="inner-right-top-left-form">
+                <label class="top-left-form-label" for="genre">Product genre: </label>
+                <select id="genre" name="genre">
+                    <option value="" disabled selected>Select a Genre</option>
+                    <option value="Men Bags">Men Bags</option>
+                    <option value="Women Bags">Women Bags</option>
+                    <option value="Men & Women">Men & Women</option>
+                    <option value="Men Jewellery">Men Jewellery</option>
+                    <option value="Women Jewellery">Women Jewellery</option>
+                    <option value="Women Jewellery">Men & Women Jewellery</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Decor Items">Decor Items</option>
+                    <option value="Gift Hampers">Gift Hampers</option>
+                </select><br><br>
+            </div>
         </div>
         <div class="upload-image">
             <label for="image">Banner image (Size < 50kb): </label>
@@ -87,8 +102,12 @@
         </div>
         <div class="type">
             <div class="inner-type">
-                <label for="price">Price in ₹: </label><br>
-                <input type="number" id="price" placeholder="Price in ₹" required name="price"><br><br>
+                <label for="price">Original Price: </label><br>
+                <input type="number" id="price" placeholder="Price in ₹" required name="Oriprice"><br><br>
+            </div>
+            <div class="inner-type">
+                <label for="price">Discount Price: </label><br>
+                <input type="number" id="price" placeholder="Price in ₹" required name="Disprice"><br><br>
             </div>
         </div>
         <hr>
@@ -107,6 +126,7 @@
         if(isset($_POST["addProduct"])){
             $product_name=$_POST["product_name"];
             $product_category=$_POST["category_select"];
+            $product_genre=$_POST["genre"];
             $product_desc=$_POST["desc"];
             $product_material=$_POST["material"];
             $product_length=$_POST["product_l"];
@@ -115,7 +135,8 @@
             $product_weight=$_POST["product_weight"];
             $product_capacity=$_POST["product_capacity"];
             $product_color=$_POST["color"];
-            $product_price=$_POST["price"];
+            $product_Oriprice=$_POST["Oriprice"];
+            $product_Disprice=$_POST["Disprice"];
             if(isset($_FILES['product_image']) && $_FILES['product_image']['error'] == 0){
                 $image_name = $_FILES['product_image']['name'];
                 $image_tmp_name = $_FILES['product_image']['tmp_name'];
@@ -130,8 +151,8 @@
                 $image_folder = "";
             }
             if($product_name!=""){
-                $sql="INSERT INTO products (product_name, product_type, product_desc, product_material, product_L, product_W, product_H, product_weight, product_capacity, product_color, product_price, product_image)
-                VALUES ('$product_name', '$product_category', '$product_desc', '$product_material', $product_length, $product_width, $product_height, $product_weight, $product_capacity, '$product_color', $product_price, '$image_folder')";
+                $sql="INSERT INTO products (product_name, product_type, genre, product_desc, product_material, product_L, product_W, product_H, product_weight, product_capacity, product_color, ori_price, product_price, product_image)
+                VALUES ('$product_name', '$product_category', '$product_genre','$product_desc', '$product_material', $product_length, $product_width, $product_height, $product_weight, $product_capacity, '$product_color', $product_Oriprice, $product_Disprice, '$image_folder')";
                 if(mysqli_query($conn, $sql)){
                     $product_id = mysqli_insert_id($conn);
                     if(!empty($_FILES["product_images"]["tmp_name"][0])){

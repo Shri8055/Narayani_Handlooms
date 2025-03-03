@@ -218,8 +218,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
                 <form class="form" method="POST" action="product.php?id=<?php echo $product_id; ?>">
     <div class="product-details">
         <h1><?php echo $row['product_name'];?></h1>
-        <p><?php echo $row['product_desc']; ?></p><br>
-        <h3><b>Price: ₹ <?php echo $row['product_price']; ?></b><br>
+        <p><?php echo $row['product_desc']; ?></p>
+        <p><b>Product genre: </b> <span class="details"><?php echo $row['genre']; ?></span></p><br>
+
+        <h3 style="font-weight: 300;"><b>Original Price: </b>₹ <s><?php echo $row['ori_price']; ?></s><br>
+        <h3><b>Discount Price: ₹ <?php echo $row['product_price']; ?></b><br><br>
             <span>Inclusive of all taxes.</span><br>
             <span class="ship"><a href="shipping.php"><u>Shipping</u></a> calculated at checkout.</span>
         </h3>

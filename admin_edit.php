@@ -23,6 +23,7 @@ if (isset($_GET['id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $product_name = $_POST['product_name'];
     $product_category = $_POST['category_select'];
+    $product_genre = $_POST['genre'];
     $product_desc = $_POST['desc'];
     $product_material = $_POST['material'];
     $product_length = $_POST['product_l'];
@@ -31,7 +32,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $product_weight = $_POST['product_weight'];
     $product_capacity = $_POST['product_capacity'];
     $product_color = $_POST['colors'];
-    $product_price = $_POST['price'];
+    $ori_price = $_POST['ori_price'];
+    $dis_price = $_POST['dis_price'];
     if (!empty($_FILES['product_image']['name'])) {
         $image_folder = 'uploads/' . basename($_FILES['product_image']['name']);
         move_uploaded_file($_FILES['product_image']['tmp_name'], $image_folder);
@@ -46,7 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $update_query = "UPDATE products SET 
         product_name = '$product_name', 
         product_type = '$product_category', 
-        product_desc = '$product_desc', 
+        product_desc = '$product_desc',
+        genre = '$product_genre',
         product_material = '$product_material', 
         product_L = '$product_length', 
         product_W = '$product_width', 
@@ -54,7 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         product_weight = '$product_weight', 
         product_capacity = '$product_capacity', 
         product_color = '$product_color', 
-        product_price = '$product_price', 
+        ori_price = '$ori_price', 
+        product_price = '$dis_price', 
         product_image = '$image_folder' 
         WHERE product_id = '$product_id'";
 
@@ -125,6 +129,20 @@ while ($img_row = mysqli_fetch_assoc($image_result)) {
                     <option value="Collector" <?php echo ($row['product_type'] == 'Collector') ? 'selected' : ''; ?>>Collector</option>
                 </select><br><br>
             </div>
+            <div class="inner-right-top-left-form">
+                <label class="top-left-form-label" for="genre">Product Genre: </label>
+                <select id="genre" name="genre">
+                    <option value="Men bags" <?php echo ($row['genre'] == 'Men bags') ? 'selected' : ''; ?>>Men bags</option>
+                    <option value="Women bags"  <?php echo ($row['genre'] == 'Women bags') ? 'selected' : ''; ?>>Women bags</option>
+                    <option value="Men & Women bags" <?php echo ($row['genre'] == 'Men & Women bags') ? 'selected' : ''; ?>>Men & Women bags</option>
+                    <option value="Accesories" <?php echo ($row['genre'] == 'Accesories') ? 'selected' : ''; ?>>Accesories</option>
+                    <option value="Men Jewellery" <?php echo ($row['genre'] == 'Men Jewellery') ? 'selected' : ''; ?>>Men Jewellery</option>
+                    <option value="Women Jewellery" <?php echo ($row['genre'] == 'Women Jewellery') ? 'selected' : ''; ?>>Women Jewellery</option>
+                    <option value="Men & Women Jewellery" <?php echo ($row['genre'] == 'Men & Women Jewellery') ? 'selected' : ''; ?>>Men & Women Jewellery</option>
+                    <option value="Decor Items" <?php echo ($row['genre'] == 'Decor Items') ? 'selected' : ''; ?>>Decor Items</option>
+                    <option value="Gift Hampers" <?php echo ($row['genre'] == 'Gift Hampers') ? 'selected' : ''; ?>>Gift Hampers</option>
+                </select><br><br>
+            </div>
         </div>
         <div class="upload-image">
             <label for="image">Banner image (Size < 50kb): </label>
@@ -183,7 +201,11 @@ while ($img_row = mysqli_fetch_assoc($image_result)) {
         <div class="type">
             <div class="inner-type">
                 <label for="price">Price in ₹: </label><br>
-                <input type="number" id="price" placeholder="Price in ₹" required name="price" value="<?php echo $row['product_price']?>"><br><br>
+                <input type="number" id="price" placeholder="Price in ₹" required name="ori_price" value="<?php echo $row['ori_price']?>"><br><br>
+            </div>
+            <div class="inner-type">
+                <label for="price">Price in ₹: </label><br>
+                <input type="number" id="price" placeholder="Price in ₹" required name="dis_price" value="<?php echo $row['product_price']?>"><br><br>
             </div>
         </div>
         <hr>

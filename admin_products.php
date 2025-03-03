@@ -92,6 +92,9 @@ while ($img_row = mysqli_fetch_assoc($image_result)) {
         <div class="product-details">
             <h1><?php echo $row['product_name']; ?></h1>
             <p><?php echo $row['product_desc']; ?></p><br>
+            <p><b>Product genre: </b> <span class="details"><?php echo $row['genre']; ?></span></p><br>
+
+            <h3 style="font-weight: 300;">Original Price: ₹ <s><?php echo $row['ori_price']; ?></s><br>
             <p><b>Product type :</b> <span class="details"><?php echo $row['product_type']; ?></span></p><br>
             <h3><b>Price: ₹ <?php echo $row['product_price']; ?></b><br>
                 <span>Inclusive of all taxes.</span><br>
