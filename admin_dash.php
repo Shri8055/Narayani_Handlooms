@@ -65,6 +65,7 @@
           $result = mysqli_query($conn, "SELECT * FROM products WHERE product_type='Special'");
           while ($row = mysqli_fetch_assoc($result)) {
               echo "<div class='card' onclick=\"window.open('admin_products.php?id=" . $row['product_id'] . "', '_blank')\">";
+              
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
               echo "<p>" . $row['product_name'] . "</p>";
               echo "<p>MRP : ₹ " . $row['ori_price'] . "</p>";
@@ -81,6 +82,23 @@
         <?php
           $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
           $result = mysqli_query($conn, "SELECT * FROM products WHERE product_type='Collector'");
+          while ($row = mysqli_fetch_assoc($result)) {
+              echo "<div class='card' onclick=\"window.open('admin_products.php?id=" . $row['product_id'] . "', '_blank')\">";
+              echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
+              echo "<p>" . $row['product_name'] . "</p>";
+              echo "<p>MRP : ₹ " . $row['ori_price'] . "</p>";
+              echo "<p>SP : ₹ " . $row['product_price'] . "</p><hr>";
+              echo "<button>EDIT 📝</button>";
+              echo "<button>DELETE ❌</button>";
+              echo "</div></a>";
+          }
+        ?>
+    </section><hr>
+    <h1>Gift Hampers | Decor | Accessories</h1>
+    <section class="special">
+        <?php
+          $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
+          $result = mysqli_query($conn, "SELECT * FROM products WHERE genre='Accessories' OR genre='Decor Items' OR genre ='Gift Hampers'");
           while ($row = mysqli_fetch_assoc($result)) {
               echo "<div class='card' onclick=\"window.open('admin_products.php?id=" . $row['product_id'] . "', '_blank')\">";
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";

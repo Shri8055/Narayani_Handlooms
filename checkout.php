@@ -1,89 +1,48 @@
 <?php
 session_start();
+if (!isset($_SESSION['user_id'])) {
+    echo "<script>
+            alert('Please log in to continue.');
+            window.location.href='login.php';
+          </script>";
+    exit;
+}
+$total_price=0;
 $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
-if (!isset($_SESSION['user_id'])) {
-    echo "<script>
-            alert('Please Sign-in / Log-in to proceed.');
-            window.location.href='product.php?id=" . $_SESSION['sel_product_id'] . "';
-        </script>";
-    exit;
-}
-
-$user_id = $_SESSION['user_id'];
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
-    $_SESSION['checkout_mode'] = 'buy_now'; // Set checkout mode to "buy now"
-    $_SESSION['buy_now_product'] = [
-        'id' => $_POST['product_id'] ?? 0,
-        'name' => $_POST['name'] ?? 'Unknown Product',
-        'price' => $_POST['price'] ?? '0',
-        'image' => $_POST['product_image'] ?? 'default.jpg',
-        'quantity' => $_POST['quantity'] ?? 1,
-    ];
-    header("Location: checkout.php");
-    exit();
-}
-$total_price=0;
-if (!isset($_SESSION['checkout_mode']) || $_SESSION['checkout_mode'] == 'cart') {
-    $_SESSION['checkout_mode'] = 'cart';
-}
-$items = [];
-if ($_SESSION['checkout_mode'] == 'buy_now' && isset($_SESSION['buy_now_product'])) {
-    $items[] = $_SESSION['buy_now_product'];
+// Check if "Buy Now" is triggered
+if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
+    $checkout_items = $_SESSION['buy_now'];
+    foreach ($checkout_items as $item) {
+        $total_price += $item['bn_price'] * $item['bn_quantity'];
+    }
+    unset($_SESSION['buy_now']); // Clear "Buy Now" session after checkout is displayed
 } else {
-    $query = "SELECT cart.*, products.product_name AS name, products.product_image AS image, products.product_price AS price
-          FROM cart 
-          JOIN products ON cart.product_id = products.product_id 
-          WHERE cart.user_id = $user_id";
-    $result = mysqli_query($conn, $query);
-    while ($row = mysqli_fetch_assoc($result)) {
-        $items[] = [
-            'name' => $row['name'],
-            'price' => $row['price'],
-            'image' => $row['image'],
-            'quantity' => $row['quantity'],
+    // Default to cart items if "Buy Now" is not triggered
+    $checkout_items = [];
+    $user_id = $_SESSION['user_id'];
+    $cart_query = "SELECT * FROM cart WHERE user_id = $user_id";
+    $cart_result = mysqli_query($conn, $cart_query);
+    
+    while ($cart_row = mysqli_fetch_assoc($cart_result)) {
+        $checkout_items[$cart_row['product_id']] = [
+            'bn_name' => $cart_row['product_name'],
+            'bn_price' => $cart_row['product_price'],
+            'bn_image' => $cart_row['product_image'],
+            'bn_quantity' => $cart_row['quantity']
         ];
-        $total_price += $row['product_price'] * $row['quantity'];
+        $total_price += $cart_row['product_price'] * $cart_row['quantity'];
     }
 }
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['place_order'])) {
-    if ($_SESSION['checkout_mode'] == 'buy_now') {
-        unset($_SESSION['buy_now_product']);
-    } else {
-        $delete_cart_query = "DELETE FROM cart WHERE user_id = " . $_SESSION['user_id'];
-        mysqli_query($conn, $delete_cart_query);
-    }
-    unset($_SESSION['checkout_mode']);
-    header("Location: order_success.php");
-    exit();
-}
-
-//
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
-    $_SESSION['checkout_mode'] = 'buy_now';
-    $_SESSION['buy_now_product'] = [
-        'id' => $_POST['product_id'] ?? 0,
-        'name' => $_POST['name'] ?? 'Unknown Product',
-        'price' => $_POST['price'] ?? '0',
-        'image' => $_POST['product_image'] ?? 'default.jpg',
-        'quantity' => $_POST['quantity'] ?? 1,
-    ];
-    header("Location: checkout.php");
-    exit();
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout</title>
+    <title>Checkout - Narayani</title>
     <link rel="stylesheet" href="checkout.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -262,8 +221,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
                         <option value="YEM +967">Yemen (+967)</option>
                         <option value="ZAF +27">South Africa (+27)</option>
                         <option value="ZMB +260">Zambia (+260)</option>
-                        <option value="ZWE +263">Zimbabwe (+263)</option>
-                        
+                        <option value="ZWE +263">Zimbabwe (+263)</option>                        
                 </select>
                 <input type="text" id="phone-input" placeholder="Phone number, If needed to contact about order" required>
             </div>
@@ -277,14 +235,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
             </div>
             <button>Total: ₹<?= number_format($total_price, 2) ?> , Pay Now</button><hr>
             <ul>
-                <a href="#"><li>Refund Policy</li></a>
-                <a href="#"><li>Shipping Policy</li></a>
-                <a href="#"><li>Privacy Policy</li></a>
-                <a href="#"><li>Terms of Service</li></a>
-                <a href="#"><li>Cancellation Policy</li></a>
-                <a href="#"><li>Contact Information</li></a>
+            <li><a href="#" onclick="openPopup('refund')">Refund Policy</a></li>
+            <li><a href="#" onclick="openPopup('shipping')">Shipping Policy</a></li>
+            <li><a href="#" onclick="openPopup('privacy')">Privacy Policy</a></li>
+            <li><a href="#" onclick="openPopup('terms')">Terms of Service</a></li>
+            <li><a href="#" onclick="openPopup('cancellation')">Cancellation Policy</a></li>
+            <li><a href="#" onclick="openPopup('contact')">Contact Information</a></li>
             </ul>
         </form>
+        <div id="policyPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <h2 id="policyTitle"></h2>
+                <p id="policyDescription"></p>
+            </div>
+        </div>
+        <script>
+            function openPopup(policy) {
+                const policyData = {
+                    refund: { title: "Refund Policy", description: "Thank you for purchasing our product ! \n\n Replacements/ Return : Items will be eligible for free replacement, within 7 days of delivery, in an unlikely event of defective or different/wrong item delivered to you. In the rare event that you receive a damaged product, please create a replacement request within 48 hours of order delivery.\n\n Your item must be in the original packaging.\n\n Your items need to have the receipt for proof of purchase.\n\nNo refund only Replacement : Once we received your request, we will inspect and notify you within 24 hours.\n\nIf your request is approved, we will replace the product.\n\nShipping : You will be responsible for paying for your own shipping cost for returning your item if the products reach to you damaged.\n\nShipping cost will be bear by us if different/wrong items is delivered. shipping cost are non refundable.\n\n If you have any queries on how to return the item to us, contact us at 1234567890 or leave us a mail at Narayani2025@gmail.com\n\nThank you !" },
+                    shipping: { title: "Shipping Policy", description: "Shipping Information \nWe provide free shipping on orders above ₹1000...\nAvailability : We shipped Pan India.\n\nProcessing time : Allow 3-4 business days processing time for your order to be shipped.\n\nPLEASE NOTE :\n\t◆ It takes 3-4 business days for deliveries pan India, that's excluding our processing time. However, due to Covid restrictions you can expect slight delay in the shipment than usual. We hope for your kind patience and understanding in this matter.\n\n \t◆ All packages are shipped via Delhivery and Bluedart courier service.\n\nOnce your order is shipped, we will notify you via Email or SMS. \n\nTo keep track on your order, whatsapp us at +91 9612608651 or write to us at Runwayindia22@gmail.com.\n\nThank you !" },
+                    privacy: { title: "Privacy Policy", description: "Narayani Handlooms Privacy Policy\n\n- Your privacy is important to us. To better protect your privacy we provide this notice explaining our online information practices and the changes you can make about the way your information is collected and used.\n\n- We value your privacy and do not share your data... \n\nWhy we collect this?\n\n- We collect this information to better understand our website visitors, and to monitor and protect the security of the website." },
+                    terms: { title: "Terms of Service", description: "This website is operated by Narayani Handlooms. Throughout the site, the terms “we”, “us” and “our” refer to Narayani Handlooms. Narayani Handlooms offers this website, including all information, tools and services available from this site to you, the user, conditioned upon your acceptance of all terms, conditions, policies and notices stated here.\n\nBy visiting our site and/ or purchasing something from us, you engage in our “Service” and agree to be bound by the following terms and conditions (“Terms of Service”, “Terms”), including those additional terms and conditions and policies referenced herein and/or available by hyperlink. These Terms of Service apply to all users of the site, including without limitation users who are browsers, vendors, customers, merchants, and/ or contributors of content.\n\nPlease read these Terms of Service carefully before accessing or using our website. By accessing or using any part of the site, you agree to be bound by these Terms of Service.If you do not agree to all the terms and conditions of this agreement, then you may not access the website or use any services. If these Terms of Service are considered an offer, acceptance is expressly limited to these Terms of Service.\n\nAny new features or tools which are added to the current store shall also be subject to the Terms of Service. You can review the most current version of the Terms of Service at any time on this page. We reserve the right to update, change or replace any part of these Terms of Service by posting updates and/or changes to our website. It is your responsibility to check this page periodically for changes.\n\n Your continued use of or access to the website following the posting of any changes constitutes acceptance of those changes.Our store is hosted on Shopify Inc. They provide us with the online e-commerce platform that allows us to sell our products and services to you." },
+                    cancellation: { title: "Cancellation Policy", description: "At Narayani Handlooms, we strive to provide our customers with high-quality handmade bags and excellent service. If you wish to cancel an order, please review our policy below:\n\n◆ Order Cancellation Before Shipment: Customers can cancel their order within 24 hours of placing it. A full refund will be issued to the original payment method.\n\n ◆ Cancellation After Shipment: Once an order has been shipped, it cannot be canceled. However, you may request a return after receiving the item, subject to our Return & Refund Policy.\n\n◆ Customized or Made-to-Order Items: Orders for personalized or custom-made products cannot be canceled once processing has begun.\n\n◆ How to Cancel: To cancel an order, contact our support team at [email/contact details] with your order ID.\n\nNarayani Handlooms reserves the right to modify this policy at any time." },
+                    contact: { title: "Contact Information", description: "WhatsApp / Phone: +91 1234567890 / +91 1234567890.\n\nEmail: Narayani2025@gmail.com\n\nFacebook: Narayani_Handlooms\n\nInstagram: @Narayani_Handlooms" },
+                };
+                document.getElementById("policyTitle").innerText = policyData[policy].title;
+                document.getElementById("policyDescription").innerText = policyData[policy].description;
+                document.getElementById("policyPopup").style.display = "flex";
+            }
+
+            function closePopup() {
+                document.getElementById("policyPopup").style.display = "none";
+            }
+        </script>
         <script>
         function updateCode() {
             var select = document.getElementById("country-select");
@@ -296,29 +280,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
     <div class="form">
         <div class="cart-items">
             <h1>Cart-items</h1><hr class="cart-items-hr">
-            <?php if (empty($items)): ?>
+            <?php if (empty($checkout_items)): ?>
                 <h3>Your cart is empty. <a href="home.php">Go Shopping</a></h3>
             <?php else: ?>
-            <table>
-                <tr>
-                    <th>Image</th>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                </tr>
-                <?php foreach ($items as $item): ?>
-                <tr>
-                    <td><img src="<?= htmlspecialchars($item['image']) ?>" width="50"></td>
-                    <td><?= htmlspecialchars($item['name']) ?></td>
-                    <td>₹<?= number_format($item['price'], 2) ?></td>
-                    <td><?= $item['quantity'] ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </table><hr class="cart-items-hr">
+    <table>
+        <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </tr>
+        <?php foreach ($checkout_items as $item): ?>
+        <tr>
+            <td><img src="<?php echo $item['bn_image']; ?>" width="50"></td>
+            <td><?php echo $item['bn_name']; ?></td>
+            <td>₹<?php echo $item['bn_price']; ?></td>
+            <td><?php echo $item['bn_quantity']; ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </table><hr class="cart-items-hr">
             <h3>Total: ₹<?= number_format($total_price, 2) ?></h3>
             <?php endif; ?>
         </div>
     </form>
 </body>
 </html>
-

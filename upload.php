@@ -43,7 +43,7 @@
                     <option value="" disabled selected>Select a Genre</option>
                     <option value="Men Bags">Men Bags</option>
                     <option value="Women Bags">Women Bags</option>
-                    <option value="Men & Women">Men & Women</option>
+                    <option value="Men & Women Bags">Men & Women Bags</option>
                     <option value="Men Jewellery">Men Jewellery</option>
                     <option value="Women Jewellery">Women Jewellery</option>
                     <option value="Women Jewellery">Men & Women Jewellery</option>

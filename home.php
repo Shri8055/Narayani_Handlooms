@@ -102,21 +102,21 @@ if (isset($_SESSION['user_id'])) {
         <section class="quick-links">
             <ul>
                 <a href="home.php"><li>HOME</li></a>
-                <a href="sale.php"><li>SALE / OFFERS</li></a>
-                <a href="best_sellers.php"><li>BEST SELLER</li></a>
+                <a href="category.php?category=Sale"><li>SALE / OFFERS</li></a>
+                <a href="category.php?category=Best Seller"><li>BEST SELLER</li></a>
                 <li id="category-toggle">SHOP BY CATEGORY ▼
                     <ul class="dropdown">
-                        <a href="bags.php"><li>BAGS</li></a><hr>
-                        <a href="bags.php"><li>MEN</li></a><hr>
-                        <a href="bags.php"><li>WOMEN</li></a><hr>
-                        <a href="bags.php"><li>MEN & WOMEN</li></a><hr>
-                        <a href="accessories.php"><li>ACCESSORIES</li></a><hr>
-                        <a href="accessories.php"><li>JEWELLERY</li></a><hr>
-                        <a href="decor.php"><li>DECOR ITEMS</li></a><hr>
-                        <a href="clothing.php"><li>GIFT HAMPERS</li></a>
+                      <a href="category.php?category=Bags"><li>BAGS</li></a><hr>
+                      <a href="category.php?category=Men"><li>MEN</li></a><hr>
+                      <a href="category.php?category=Women"><li>WOMEN</li></a><hr>
+                      <a href="category.php?category=MenandWomen"><li>MEN & WOMEN</li></a><hr>
+                      <a href="category.php?category=Accessories"><li>ACCESSORIES</li></a><hr>
+                      <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a><hr>
+                      <a href="category.php?category=Decor"><li>DECOR ITEMS</li></a><hr>
+                      <a href="category.php?category=Gift hampers"><li>GIFT HAMPERS</li></a>
                     </ul>
                 </li>
-                <a href="jewellery.php"><li>JEWELLERY</li></a>
+                <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
                 <a href="custom_order.php"><li>CUSTOMISED ORDER</li></a>
                 <a href="bulk_order.php"><li>BULK ORDER</li></a>
                 <a href="#about-us"><li>ABOUT US</li></a>
@@ -265,7 +265,6 @@ if (isset($_SESSION['user_id'])) {
             <div class="footer-right-container">
               <u><p>Quick Links</p></u>
               <ul>
-                <li>About Us</li>
                 <li>Delivery Timeline</li>
                 <li>Shipping & Returns</li>
                 <li>Privacy Policy</li>

@@ -23,6 +23,11 @@ if ($db_cart_result) {
         $total_price += $db_cart_item['product_price'] * $db_cart_item['quantity'];
     }
 }
+if (isset($_POST['checkout_cart'])) {
+    $_SESSION['checkout_mode'] = 'cart'; // Set mode to Cart
+    header("Location: checkout.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -84,7 +89,7 @@ if ($db_cart_result) {
         <?php endforeach; ?>
     </table>
     <span class="cart-total-f">Total: ₹<?= number_format($total_price, 2) ?></span>
-    <a href="checkout.php" class="checkout-btn">Proceed to Checkout</a>
+    <a href="checkout.php" class="checkout-btn" name="checkout_cart">Proceed to Checkout</a>
     <?php endif; ?>
 </div>
 </body>

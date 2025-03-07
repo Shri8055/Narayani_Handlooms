@@ -44,7 +44,37 @@ if (isset($_SESSION['user_id'])) {
 }
 // buy now
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
-  $_SESSION['sel_product_id'] = $_POST['product_id']; // Fix: Removed extra dot (.)
+  $_SESSION['sel_product_id'] = $_POST['product_id'];
+  if (!isset($_SESSION['user_id'])) {
+    echo "<script>
+              alert('Please Sign-in / Log-in to proceed.');
+              window.location.href='product.php?id=" . $_SESSION['sel_product_id'] . "';
+          </script>";
+      exit;
+  }
+  $bn_user_id=$_SESSION['user_id'];
+  $bn_product_id=(int) $_POST['buy_now_product_id'];
+  $bn_product_name=mysqli_real_escape_string($conn, $_POST['buy_now_product_name']);
+  $bn_product_price=(float) $_POST['buy_now_product_price'];
+  $bn_product_image = mysqli_real_escape_string($conn, $_POST['buy_now_product_image']);
+  $bn_quantity = isset($_POST['quantity']) ? (int) $_POST['quantity'] : 1;
+  if ($bn_product_id <= 0 || empty($bn_product_name) || $bn_product_price <= 0 || empty($bn_product_image)) {
+    echo "<script>alert('Invalid product details.');</script>";
+    exit;
+  }
+  if(!isset($_SESSION['buy_now']) || !is_array($_SESSION['buy_now'])) {
+    $_SESSION['buy_now'] = [];
+  }
+  if (isset($_SESSION['buy_now'][$bn_product_id])) {
+    $_SESSION['buy_now'][$bn_product_id]['buy_now_quantity'] += $bn_quantity;
+  } else {
+      $_SESSION['buy_now'][$bn_product_id] = [
+          'bn_name' => $bn_product_name,
+          'bn_price' => $bn_product_price,
+          'bn_image' => $bn_product_image,
+          'bn_quantity' => $bn_quantity
+      ];
+  }
   header('Location: checkout.php');
   exit;
 }
@@ -136,12 +166,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
                         <label for="user"><i class="fa-solid fa-envelope"></i></label>
                         <input type="email" id="user" name="email" placeholder="Email" required>
                       </div>
-
                       <div class="input-container">
                         <label for="pass"><i class="fa-solid fa-key"></i></label>
                         <input type="password" id="pass" name="password" placeholder="Password" required>
                       </div>
-
                           <a href="#" class="forgot-pass"><p>Forgot password ?</p></a>
                           <button type="submit" name="login" class="login-btn">Login</button>
                       </form>
@@ -152,12 +180,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
                           <label for="fname"><i class="fa-solid fa-user"></i></label>
                           <input type="text" id="fname" name="name" placeholder="Full Name" required>
                         </div>
-
                         <div class="input-container">
                           <label for="email"><i class="fa-solid fa-envelope"></i></label>
                           <input type="email" id="email" name="email" placeholder="Email" required>
                         </div>
-
                         <div class="input-container">
                           <label for="pass"><i class="fa-solid fa-key"></i></label>
                           <input type="password" id="pass" name="password" placeholder="Password" required>
@@ -188,16 +214,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
         </section><hr>
         <section class="quick-links">
             <ul>
-                <li>HOME</li>
-                <li>SALE / OFFERS</li>
-                <li>BEST SELLER</li>
-                <li>SHOP BY CATAGORY</li>
-                <li>JEWELLERY</li>
-                <li>CUSTOMISED ORDER</li>
-                <li>BULK ORDER</li>
-                <li>ABOUT US</li>
-                <li>CONTACT US</li>
+                <a href="home.php?"><li>HOME</li></a>
+                <a href="category.php?category=Sale"><li>SALE / OFFERS</li></a>
+                <a href="category.php?category=Best Seller"><li>BEST SELLER</li></a>
+                <li id="category-toggle">SHOP BY CATEGORY ▼
+                    <ul class="dropdown">
+                      <a href="category.php?category=Bags"><li>BAGS</li></a><hr class="hr-li">
+                      <a href="category.php?category=Men"><li>MEN</li></a><hr class="hr-li">
+                      <a href="category.php?category=Women"><li>WOMEN</li></a><hr class="hr-li">
+                      <a href="category.php?category=MenandWomen"><li>MEN & WOMEN</li></a><hr class="hr-li">
+                      <a href="category.php?category=Accessories"><li>ACCESSORIES</li></a><hr class="hr-li">
+                      <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a><hr class="hr-li">
+                      <a href="category.php?category=Decor"><li>DECOR ITEMS</li></a><hr class="hr-li">
+                      <a href="category.php?category=Gift hampers"><li>GIFT HAMPERS</li></a>
+                    </ul>
+                </li>
+                <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
+                <a href="custom_order.php"><li>CUSTOMISED ORDER</li></a>
+                <a href="bulk_order.php"><li>BULK ORDER</li></a>
+                <a href="home.php#about-us"><li>ABOUT US</li></a>
+                <a href="contact.php"><li>CONTACT US</li></a>
             </ul>
+            <script>
+              document.addEventListener("DOMContentLoaded", function () {
+                const categoryToggle = document.getElementById("category-toggle");
+
+                categoryToggle.addEventListener("click", function () {
+                    this.classList.toggle("active");
+                });
+              });
+            </script>
         </section>
           <div class="container">
             <div class="product">
@@ -226,7 +272,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
             <span>Inclusive of all taxes.</span><br>
             <span class="ship"><a href="shipping.php"><u>Shipping</u></a> calculated at checkout.</span>
         </h3>
-        
+        <p><b>Product type :</b> <span class="details"><?php echo $row['product_type']; ?></span></p><br>
         <input type="hidden" name="product_id" value="<?php echo $row['product_id']; ?>">
         <input type="hidden" name="product_name" value="<?php echo $row['product_name']; ?>">
         <input type="hidden" name="product_price" value="<?php echo $row['product_price']; ?>">
@@ -245,12 +291,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
         <p><b>Color :</b> <span class="details"><?php echo $row['product_color']; ?></span></p>
 
         <!-- "Buy Now" will redirect directly to checkout.php -->
-        <form class="form" method="POST" action="product.php?id=<?php echo $product_id; ?>">
-            <input type="hidden" name="product_id" value="<?php echo $row['product_id']; ?>">
-            <input type="hidden" name="name" value="<?php echo htmlspecialchars($row['product_name']); ?>">
-            <input type="hidden" name="price" value="<?php echo $row['product_price']; ?>">
-            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($row['product_image']); ?>">
-            <input type="hidden" name="quantity" value="1"> 
+        <form class="form" method="POST">
+            <input type="hidden" name="buy_now_product_id" value="<?php echo $row['product_id']; ?>">
+            <input type="hidden" name="buy_now_product_name" value="<?php echo htmlspecialchars($row['product_name']); ?>">
+            <input type="hidden" name="buy_now_product_price" value="<?php echo $row['product_price']; ?>">
+            <input type="hidden" name="buy_now_product_image" value="<?php echo htmlspecialchars($row['product_image']); ?>">
+            <input type="hidden" name="buy_now_quantity" value="1"> 
             <button type="submit" name="buy_now">Buy Now</button>
         </form>
         <!-- "Add to Cart" will remain inside the original form -->
@@ -274,7 +320,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
                     echo "<div class='card'>";
                     echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
                     echo "<p>" . $row['product_name'] . "</p>";
-                    echo "<p>Price: ₹ " . $row['product_price'] . "</p>";
+                    echo "<p>MRP: ₹ <s>" . $row['ori_price'] . "</s></p>";
+                    echo "<p>Discount Price: ₹ " . $row['product_price'] . "</p>";
                     echo "</div></a>";
                   }
               ?>
@@ -289,7 +336,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
             <div class="footer-right-container">
               <u><p>Quick Links</p></u>
               <ul>
-                <li>About Us</li>
                 <li>Delivery Timeline</li>
                 <li>Shipping & Returns</li>
                 <li>Privacy Policy</li>

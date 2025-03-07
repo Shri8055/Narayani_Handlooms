@@ -23,7 +23,7 @@ if (isset($_GET['id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $product_name = $_POST['product_name'];
     $product_category = $_POST['category_select'];
-    $product_genre = $_POST['genre'];
+    $product_genre = mysqli_real_escape_string($conn, $_POST['genre']);
     $product_desc = $_POST['desc'];
     $product_material = $_POST['material'];
     $product_length = $_POST['product_l'];
@@ -127,6 +127,9 @@ while ($img_row = mysqli_fetch_assoc($image_result)) {
                     <option value="Featured" <?php echo ($row['product_type'] == 'Featured') ? 'selected' : ''; ?>>Featured</option>
                     <option value="Special" <?php echo ($row['product_type'] == 'Special') ? 'selected' : ''; ?>>Special</option>
                     <option value="Collector" <?php echo ($row['product_type'] == 'Collector') ? 'selected' : ''; ?>>Collector</option>
+                    <option value="Decor" <?php echo ($row['product_type'] == 'Decor') ? 'selected' : ''; ?>>Decor</option>
+                    <option value="Accesories" <?php echo ($row['product_type'] == 'Accesories') ? 'selected' : ''; ?>>Accesories</option>
+                    <option value="Gift Hamper" <?php echo ($row['product_type'] == 'Gift Hamper') ? 'selected' : ''; ?>>Gift Hamper</option>
                 </select><br><br>
             </div>
             <div class="inner-right-top-left-form">
