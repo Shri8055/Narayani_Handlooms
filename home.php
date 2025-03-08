@@ -117,10 +117,10 @@ if (isset($_SESSION['user_id'])) {
                     </ul>
                 </li>
                 <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
-                <a href="custom_order.php"><li>CUSTOMISED ORDER</li></a>
-                <a href="bulk_order.php"><li>BULK ORDER</li></a>
+                <a href="#"><li>CUSTOMISED ORDER</li></a>
+                <a href="#"><li>BULK ORDER</li></a>
                 <a href="#about-us"><li>ABOUT US</li></a>
-                <a href="contact.php"><li>CONTACT US</li></a>
+                <a href="contact_us.php"><li>CONTACT US</li></a>
             </ul>
         </section>
         <section class="slide-show">
@@ -177,7 +177,7 @@ if (isset($_SESSION['user_id'])) {
           }
         ?>
         </section>
-        <button class="view-all-cards">VIEW ALL </button><hr>
+        <a href="view.php?view=Featured"><button class="view-all-cards">VIEW ALL </button></a><hr>
         <section class="gifting">
           <div class="gifting-card">
             <div class="gifting-text">
@@ -206,7 +206,7 @@ if (isset($_SESSION['user_id'])) {
           }
         ?>
         </section>
-        <button class="view-all-cards">VIEW ALL </button><hr>
+        <a href="view.php?view=Special"><button class="view-all-cards">VIEW ALL </button></a><hr>
         <h4 class="other-collection-h4">COLLECTOR ITEMS</h4>
         <section class="other-collection">
         <?php
@@ -223,7 +223,7 @@ if (isset($_SESSION['user_id'])) {
           }
         ?>
         </section>
-        <button class="view-all-cards">VIEW ALL </button><hr>
+        <a href="view.php?view=Collector"><button class="view-all-cards">VIEW ALL </button></a><hr>
         <?php
           $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
           $dispQuery = mysqli_query($conn, "SELECT * FROM products WHERE genre='Accessories' OR genre='Decor Items' OR genre ='Gift Hampers'");
@@ -244,7 +244,7 @@ if (isset($_SESSION['user_id'])) {
                   }
               ?>
               </section>
-              <button class="view-all-cards">VIEW ALL</button><hr>
+              <a href="view.php?view=Gift Hamper | Decor | Accessories"><button class="view-all-cards">VIEW ALL</button></a><hr>
           <?php
           } 
         ?>
@@ -267,10 +267,10 @@ if (isset($_SESSION['user_id'])) {
               <ul>
                 <li>Delivery Timeline</li>
                 <li>Shipping & Returns</li>
-                <li>Privacy Policy</li>
+                <li>Your Orders</li>
                 <li>Custom Orders</li>
                 <li>Bulk Orders</li>
-                <li>Contact Us</li>
+                <a href="contact_us.php"><li>Contact Us</li></a>
               </ul>
             </div>
           </section>
@@ -319,6 +319,7 @@ if (isset($_SESSION['user_id'])) {
     
             if($stmt->execute()){
                 $_SESSION['user_id'] = $stmt->insert_id;
+                $_SESSION['username']=$user_name;
                 echo "User registered successfully!";
                 echo '<script>alert("User registered successfully!")</script>';
                 header("Location: home.php?success=1");

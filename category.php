@@ -146,10 +146,10 @@ $result = mysqli_query($conn, $query);
                     </ul>
                 </li>
                 <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
-                <a href="custom_order.php"><li>CUSTOMISED ORDER</li></a>
-                <a href="bulk_order.php"><li>BULK ORDER</li></a>
+                <a href="#"><li>CUSTOMISED ORDER</li></a>
+                <a href="#"><li>BULK ORDER</li></a>
                 <a href="home.php#about-us"><li>ABOUT US</li></a>
-                <a href="contact.php"><li>CONTACT US</li></a>
+                <a href="contact_us.php"><li>CONTACT US</li></a>
             </ul>
         </section>
         <h4 class="collection-h4"><?php echo strtoupper($category); ?> COLLECTION</h4>

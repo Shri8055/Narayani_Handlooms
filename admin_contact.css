@@ -1,0 +1,39 @@
+*{
+    margin: 0;
+    padding: 0;
+    background-color: #f6f5f4;
+    font-family: "Inter", serif;
+}
+h1{
+    margin-top: 20px;
+    text-align: center;
+}
+hr{
+    margin: 10px 0;
+}
+table{
+    width: 70%;
+    margin: auto;
+}
+th, td{
+    padding-bottom: 3px;
+    border-bottom: 1px solid black;
+}
+td{
+    padding: 20px;
+}
+.td3{
+    width: 50%;
+}
+.td1, .td4{
+    text-align: center;
+}
+button{
+    position: absolute;
+    padding: 10px;
+    margin: 0px 25px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.383);
+}

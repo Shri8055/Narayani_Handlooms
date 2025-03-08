@@ -27,7 +27,7 @@
             <li>Add offers</li>
             <li>Orders<span class="cart-value">99</span></li>
             <li>Refunds inside orders(returned)<span class="cart-value">0</span></li>
-            <li>Contact<span class="cart-value">9</span></li>
+            <li><a href="admin_contact.php">Contact<span class="cart-value"><?php echo $_SESSION['contact_count'] ?? '0'; ?></span></a></li>
             <li>Bulk orders<span class="cart-value">99</span></li>
             <ol>
                 <li>

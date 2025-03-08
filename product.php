@@ -313,7 +313,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
                 $query = mysqli_query($conn, "SELECT product_type FROM products WHERE product_id = $current_product_id");
                 $current_product = mysqli_fetch_assoc($query);
                 $current_product_type = $current_product['product_type'];
-                $result = mysqli_query($conn, "SELECT * FROM products WHERE product_id != $current_product_id AND product_type='$current_product_type' ORDER BY RAND() LIMIT 8");
+                $result = mysqli_query($conn, "SELECT * FROM products WHERE product_id != $current_product_id AND product_type='$current_product_type' ORDER BY RAND() LIMIT 4");
                 while ($row = mysqli_fetch_assoc($result)){
                     echo "<a href='product.php?id=" . $row['product_id'] . "' target='_blank' class='card-link'>";
                     $_SESSION['sel_product_id']=$row['product_id'];
