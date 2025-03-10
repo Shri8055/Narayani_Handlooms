@@ -229,8 +229,8 @@ document.addEventListener("DOMContentLoaded", function () {
     
             if($stmt->execute()){
                 $_SESSION['user_id'] = $stmt->insert_id;
-                echo "User registered successfully!";
-                echo '<script>alert("User registered successfully!")</script>';
+                $_SESSION['username']=$user_name;
+                echo "<script>alert('User registered successfully!'); window.location.href='home.php';</script>";
                 header("Location: home.php?success=1");
                 exit();
             }else{

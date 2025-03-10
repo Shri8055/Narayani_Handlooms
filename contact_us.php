@@ -25,7 +25,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = mysqli_query($conn, "SELECT COUNT(id) AS total FROM contact");
         $row = mysqli_fetch_assoc($result);
         $_SESSION['contact_count'] = $row['total'];
-        echo "<script>alert('Message sent successfully!\nYou will receive email reply within 2-3 working days.'); window.location.href='contact_us.php';</script>";
+        echo "<script>
+            alert('Message sent successfully!\\nYou will receive an email reply within 2-3 working days.');
+            window.location.href='contact_us.php';
+            </script>";
     } else {
         echo "<script>alert('Error: " . mysqli_error($conn) . "');</script>";
     }

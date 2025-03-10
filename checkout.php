@@ -59,7 +59,7 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
 <div class="form">
         <form method="POST">
             <label for="contact" class="contact-head">Contact</label>
-            <input type="text" id="contact" class="contact" placeholder="Email / Mobile number" required><br>
+            <input type="text" id="contact" class="contact" placeholder="Email / Mobile number" ><br>
             <div class="checkbox">
                 <input type="checkbox" id="checkbox">
                 <label for="checkbox">Email me with news and offers</label><br>
@@ -67,7 +67,7 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
 
             <label for="country" class="country-head">Delivery</label>
             <label for="country">Country</label>
-            <select name="country" id="country" required>
+            <select name="country" id="country" >
                 <option value="India">India</option>
                 <?php
                 $countries = [
@@ -99,14 +99,14 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
                 }
                 ?>
             </select><br>
-            <input type="text" name="first-name" class="first-name" placeholder="First name" required>
-            <input type="text" name="last-name" class="last-name" placeholder="Last name" required>
+            <input type="text" name="first-name" class="first-name" placeholder="First name" >
+            <input type="text" name="last-name" class="last-name" placeholder="Last name" >
             <input type="text" name="company" class="company" placeholder="Company (Optional)">
-            <input type="text" name="address" class="address" placeholder="Address" required>
+            <input type="text" name="address" class="address" placeholder="Address" >
             <input type="text" name="extra-address-details" class="extra-add" placeholder="Apartment, suite, Landmark, etc. (Optional)">
-            <input type="text" name="state" class="region" placeholder="State" required>
-            <input type="text" name="city" class="region" placeholder="City" required>
-            <input type="text" name="pin-code" class="region" placeholder="PIN code" required>
+            <input type="text" name="state" class="region" placeholder="State" >
+            <input type="text" name="city" class="region" placeholder="City" >
+            <input type="text" name="pin-code" class="region" placeholder="PIN code" >
             
             <div class="phone-container">
                 <span class="phone-code" id="selected-code">IND +91</span>
@@ -223,17 +223,17 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
                         <option value="ZMB +260">Zambia (+260)</option>
                         <option value="ZWE +263">Zimbabwe (+263)</option>                        
                 </select>
-                <input type="text" id="phone-input" placeholder="Phone number, If needed to contact about order" required>
+                <input type="text" id="phone-input" placeholder="Phone number, If needed to contact about order" >
             </div>
             
             <label for="ship-instru">Shipping instruction:</label>
             <input type="text" id="ship-instru" name="ship-instru" placeholder="Shipping Instructions">
-            
+            <hr>
             <div class="payment">
                 <label>Payment</label>
                 <p>All transactions are secure and encrypted</p>
             </div>
-            <button>Total: ₹<?= number_format($total_price, 2) ?> , Pay Now</button><hr>
+            <a href="qr_payment.php" class="payment-btn">Total: ₹<?= number_format($total_price, 2) ?> , Pay Now</a><hr>
             <ul>
             <li><a href="#" onclick="openPopup('refund')">Refund Policy</a></li>
             <li><a href="#" onclick="openPopup('shipping')">Shipping Policy</a></li>

@@ -320,8 +320,7 @@ if (isset($_SESSION['user_id'])) {
             if($stmt->execute()){
                 $_SESSION['user_id'] = $stmt->insert_id;
                 $_SESSION['username']=$user_name;
-                echo "User registered successfully!";
-                echo '<script>alert("User registered successfully!")</script>';
+                echo "<script>alert('User registered successfully!'); window.location.href='home.php';</script>";
                 header("Location: home.php?success=1");
                 exit();
             }else{
