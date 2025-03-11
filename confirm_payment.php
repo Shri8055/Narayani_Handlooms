@@ -1,5 +1,53 @@
 <?php
 session_start();
+$conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST"){
+    $transaction_id = $_POST['transaction_id'];
+    $transaction_date = $_POST['transaction_date'];
+    $transaction_time = $_POST['transaction_time'];
+    $amount = $_SESSION['total_price'] ?? 0;
+    $order_id = $_SESSION['order_id'] ?? null;
+    $user_id = $_SESSION['user_id'] ?? null;
+    $user_name = $_SESSION['user_name'] ?? '';
+
+    if (!$order_id || !$user_id) {
+        die("Session data missing. Please login again.");
+    }
+
+    $check_sql = "SELECT * FROM transactions WHERE transaction_id = ?";
+    $check_stmt = mysqli_prepare($conn, $check_sql);
+    mysqli_stmt_bind_param($check_stmt, "s", $transaction_id);
+    mysqli_stmt_execute($check_stmt);
+    $result = mysqli_stmt_get_result($check_stmt);
+
+    if (mysqli_num_rows($result) > 0) {
+        echo "<script>alert('Transaction ID already exists. Use a unique one.'); window.history.back();</script>";
+        exit();
+    }
+
+    $sql = "INSERT INTO transactions (transaction_id, order_id, user_id, user_name, amount, transaction_date, transaction_time, payment_status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')";
+
+    $stmt = mysqli_prepare($conn, $sql);
+    if (!$stmt) {
+        die("Prepare failed: " . mysqli_error($conn));
+    }
+
+    mysqli_stmt_bind_param($stmt, "siisdss", $transaction_id, $order_id, $user_id, $user_name, $amount, $transaction_date, $transaction_time);
+
+    if (mysqli_stmt_execute($stmt)) {
+        echo "<script>alert('Payment details submitted! We will verify your order soon. You will receive an email about your order.');
+                window.location.href='home.php';
+            </script>";
+        exit();
+    } else {
+        die("Error inserting data: " . mysqli_stmt_error($stmt));
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -21,7 +69,7 @@ session_start();
     <h2>Confirm Your Payment</h2><hr><br>
     <p class="note-n">Please enter valid UPI transaction ID you received after payment.</p><br>
 
-    <form method="POST" onsubmit="return validateForm(event)">
+    <form method="post">
         <label for="">UPI transaction id:</label>
         <input type="text" id="transaction_id" name="transaction_id" placeholder="Enter UPI Transaction ID" required><br><br>
 
@@ -33,24 +81,5 @@ session_start();
         <button type="submit">Confirm Payment</button>
     </form>
 </div>
-
-<script>
-function validateForm(event) {
-    event.preventDefault();
-    let transactionId = document.getElementById("transaction_id").value.trim();
-    let transactionDate = document.getElementById("transaction_date").value;
-    let transactionTime = document.getElementById("transaction_time").value;
-    if (transactionId === "" || transactionDate === "" || transactionTime === "") {
-        alert("Please fill in all the fields before confirming payment.");
-        return false;
-    }
-    setTimeout(function() {
-        alert("Your details are sent, we will confirm your order in 1-2 working days.\nYou will receive an email about your order.");
-        window.location.href = "home.php";
-    }, 1000);
-    return true;
-}
-</script>
-
 </body>
 </html>

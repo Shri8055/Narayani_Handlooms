@@ -4,7 +4,6 @@ $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
 $query = "SELECT full_name, email, msg_txt, submitted_at FROM contact ORDER BY submitted_at DESC";
 $result = mysqli_query($conn, $query);
 

@@ -1,8 +1,14 @@
 <?php
 session_start();
+include 'cart_session.php';
+$cart_total = $_SESSION['total_price'];
+$cart_items = $_SESSION['cart_items'] ?? [];
 
-$cart_total = 1500;
-$cart_note = "Order: 3 items";
+$cart_note = "Order: " . count($cart_items) . " items\n";
+foreach ($cart_items as $item) {
+    $cart_note .= $item['name'] . " (Qty: " . $item['quantity'] . "), ";
+}
+$cart_note = rtrim($cart_note, ", ");
 
 $upi_id = "shrinivaskangralkar8055@oksbi";
 $shop_name = "Narayani Handlooms";
@@ -34,13 +40,12 @@ $qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" 
     <p class="note"><?php echo $cart_note; ?></p>
 
     <img src="<?php echo $qr_code_url; ?>" alt="Payment QR Code" width="300" height="300">
-    <p>UPI ID : shrinivaskangralkar8055@oksbi</p><br>
-    <p class="note">Scan this QR code with any UPI app (Google Pay, PhonePe, Paytm) to complete the payment.</p>
+    <p>UPI ID : <?php echo $upi_id; ?></p><br>
+    <p class="note">Scan this QR code with any UPI app (<b>Google Pay, PhonePe, Paytm</b>) to complete the payment.</p>
     <br>
     <a href="<?php echo $upi_link; ?>" onclick="redirectAfterPayment()">
         <button>Confirm Payment ➡</button>
     </a>
-    
     <p class="note-r">Once payment done then, click on " Confirm Payment " button, if not then your order will not be placed but your money will be debited.</p>
 </div>
 <script>

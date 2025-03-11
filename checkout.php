@@ -3,7 +3,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) {
     echo "<script>
             alert('Please log in to continue.');
-            window.location.href='login.php';
+            window.location.href='home.php';
           </script>";
     exit;
 }
@@ -12,15 +12,15 @@ $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-// Check if "Buy Now" is triggered
 if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
     $checkout_items = $_SESSION['buy_now'];
     foreach ($checkout_items as $item) {
         $total_price += $item['bn_price'] * $item['bn_quantity'];
+        $_SESSION['total_price']=$total_price;
     }
-    unset($_SESSION['buy_now']); // Clear "Buy Now" session after checkout is displayed
+    unset($_SESSION['buy_now']);
+    unset($_SESSION['total_price']);
 } else {
-    // Default to cart items if "Buy Now" is not triggered
     $checkout_items = [];
     $user_id = $_SESSION['user_id'];
     $cart_query = "SELECT * FROM cart WHERE user_id = $user_id";
@@ -34,6 +34,66 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
             'bn_quantity' => $cart_row['quantity']
         ];
         $total_price += $cart_row['product_price'] * $cart_row['quantity'];
+        $_SESSION['total_price']=$total_price;
+    }
+}
+$user_id = $_SESSION['user_id']; 
+$total_price = $_SESSION['total_price']; 
+$order_status = "Pending";
+
+if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])){
+    $followup = mysqli_real_escape_string($conn, $_POST['folwup']);
+    $country = mysqli_real_escape_string($conn, $_POST['country']);
+    $f_name = mysqli_real_escape_string($conn, $_POST['first_name']);
+    $l_name = mysqli_real_escape_string($conn, $_POST['last_name']);
+    $company = mysqli_real_escape_string($conn, $_POST['company']);
+    $address = mysqli_real_escape_string($conn, $_POST['address']);
+    $e_address = mysqli_real_escape_string($conn, $_POST['extra_address']);
+    $state = mysqli_real_escape_string($conn, $_POST['state']);
+    $city = mysqli_real_escape_string($conn, $_POST['city']);
+    $pincode = mysqli_real_escape_string($conn, $_POST['pin_code']);
+    $ph_code = mysqli_real_escape_string($conn, $_POST['ph_code']);
+    $phone_no = mysqli_real_escape_string($conn, $_POST['ph_no']);
+    $ship_instr = mysqli_real_escape_string($conn, $_POST['ship_instru']);
+    $total_price = $_SESSION['total_price'] ?? 0;
+    $user_id = $_SESSION['user_id'];
+    $user_F_name=$f_name . " " . $l_name;
+    $_SESSION['user_name']=$user_F_name;
+    if (empty($f_name) || empty($l_name) || empty($address) || empty($state) || empty($city) || empty($pincode) || empty($phone_no)) {
+        echo "<script>alert('Please fill all required fields'); window.location.href='checkout.php';</script>";
+    } else {
+        $insert_query = "INSERT INTO orders (
+            user_id, followup, country, first_name, last_name, company, 
+            address, extra_address, state, city, pin_code, 
+            phone_country_code, phone_number, shipping_instructions, total_price
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        $stmt = mysqli_prepare($conn, $insert_query);
+        mysqli_stmt_bind_param($stmt, "isssssssssssssd", $user_id, $followup, $country, $f_name, $l_name, $company, $address, $e_address, $state, $city, $pincode, $ph_code, $phone_no, $ship_instr, $total_price);
+
+        if (mysqli_stmt_execute($stmt)) {
+            mysqli_stmt_close($stmt);
+    
+            // Retrieve the last order_id
+            $order_query = "SELECT order_id FROM orders WHERE user_id = ? ORDER BY order_id DESC LIMIT 1";
+            $stmt = mysqli_prepare($conn, $order_query);
+            mysqli_stmt_bind_param($stmt, "i", $user_id);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $order_id);
+            mysqli_stmt_fetch($stmt);
+            mysqli_stmt_close($stmt);
+    
+            if ($order_id) {
+                $_SESSION['order_id'] = $order_id;
+                echo "<script>window.location.href='qr_payment.php?order_id=" . $order_id . "';</script>";
+                exit();
+            } else {
+                echo "<script>alert('Error fetching order ID.'); window.location.href='checkout.php';</script>";
+                exit();
+            }
+        } else {
+            die("Error: " . mysqli_error($conn));
+        }
     }
 }
 ?>
@@ -59,7 +119,7 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
 <div class="form">
         <form method="POST">
             <label for="contact" class="contact-head">Contact</label>
-            <input type="text" id="contact" class="contact" placeholder="Email / Mobile number" ><br>
+            <input type="text" id="contact" class="contact" name="folwup" placeholder="Email / Mobile number (Optional)" ><br>
             <div class="checkbox">
                 <input type="checkbox" id="checkbox">
                 <label for="checkbox">Email me with news and offers</label><br>
@@ -99,19 +159,19 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
                 }
                 ?>
             </select><br>
-            <input type="text" name="first-name" class="first-name" placeholder="First name" >
-            <input type="text" name="last-name" class="last-name" placeholder="Last name" >
+            <input type="text" name="first_name" class="first-name" placeholder="First name" required>
+            <input type="text" name="last_name" class="last-name" placeholder="Last name" required>
             <input type="text" name="company" class="company" placeholder="Company (Optional)">
-            <input type="text" name="address" class="address" placeholder="Address" >
-            <input type="text" name="extra-address-details" class="extra-add" placeholder="Apartment, suite, Landmark, etc. (Optional)">
-            <input type="text" name="state" class="region" placeholder="State" >
-            <input type="text" name="city" class="region" placeholder="City" >
-            <input type="text" name="pin-code" class="region" placeholder="PIN code" >
+            <input type="text" name="address" class="address" placeholder="Address" required>
+            <input type="text" name="extra_address" class="extra-add" placeholder="Apartment, suite, Landmark, etc. (Optional)">
+            <input type="text" name="state" class="region" placeholder="State" required>
+            <input type="text" name="city" class="region" placeholder="City" required>
+            <input type="text" name="pin_code" class="region" placeholder="PIN code" required>
             
             <div class="phone-container">
                 <span class="phone-code" id="selected-code">IND +91</span>
-                <select id="country-select" onchange="updateCode()">
-                <option value="IND +91" selected>India (+91)</option>
+                <select id="country-select" name="ph_code" onchange="updateCode()">
+                        <option value="IND +91" selected>India (+91)</option>
                         <option value="AFG +93">Afghanistan (+93)</option>
                         <option value="ALB +355">Albania (+355)</option>
                         <option value="DZA +213">Algeria (+213)</option>
@@ -223,17 +283,17 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
                         <option value="ZMB +260">Zambia (+260)</option>
                         <option value="ZWE +263">Zimbabwe (+263)</option>                        
                 </select>
-                <input type="text" id="phone-input" placeholder="Phone number, If needed to contact about order" >
+                <input type="text" id="phone-input" name="ph_no" placeholder="Phone number, If needed to contact about order" required>
             </div>
             
             <label for="ship-instru">Shipping instruction:</label>
-            <input type="text" id="ship-instru" name="ship-instru" placeholder="Shipping Instructions">
+            <input type="text" id="ship-instru" name="ship_instru" placeholder="Shipping Instructions">
             <hr>
             <div class="payment">
                 <label>Payment</label>
                 <p>All transactions are secure and encrypted</p>
             </div>
-            <a href="qr_payment.php" class="payment-btn">Total: ₹<?= number_format($total_price, 2) ?> , Pay Now</a><hr>
+            <input class="payment-btn" type="submit" name="payNow" value="Total: ₹<?= number_format($total_price, 2) ?> , Pay Now"><hr>
             <ul>
             <li><a href="#" onclick="openPopup('refund')">Refund Policy</a></li>
             <li><a href="#" onclick="openPopup('shipping')">Shipping Policy</a></li>

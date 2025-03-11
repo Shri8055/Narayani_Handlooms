@@ -60,6 +60,7 @@ form{
     align-items: center;
     justify-content: center;
     float: right;
+    margin-bottom: 40px;
 }
 .product-container{ 
     display: flex; 

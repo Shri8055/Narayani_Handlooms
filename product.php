@@ -78,7 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
   header('Location: checkout.php');
   exit;
 }
-
 // add to cart
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
     if (!isset($_SESSION['user_id'])) {

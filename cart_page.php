@@ -24,7 +24,7 @@ if ($db_cart_result) {
     }
 }
 if (isset($_POST['checkout_cart'])) {
-    $_SESSION['checkout_mode'] = 'cart'; // Set mode to Cart
+    $_SESSION['checkout_mode'] = 'cart';
     header("Location: checkout.php");
     exit;
 }

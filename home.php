@@ -118,7 +118,7 @@ if (isset($_SESSION['user_id'])) {
                 </li>
                 <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
                 <a href="#"><li>CUSTOMISED ORDER</li></a>
-                <a href="#"><li>BULK ORDER</li></a>
+                <a href="#"><li>YOUR ORDERS</li></a>
                 <a href="#about-us"><li>ABOUT US</li></a>
                 <a href="contact_us.php"><li>CONTACT US</li></a>
             </ul>
@@ -269,7 +269,7 @@ if (isset($_SESSION['user_id'])) {
                 <li>Shipping & Returns</li>
                 <li>Your Orders</li>
                 <li>Custom Orders</li>
-                <li>Bulk Orders</li>
+                <li>Your Orders</li>
                 <a href="contact_us.php"><li>Contact Us</li></a>
               </ul>
             </div>
