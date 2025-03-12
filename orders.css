@@ -1,0 +1,106 @@
+*{
+    margin: 0;
+    padding: 0;
+    background-color: #f6f5f4;
+    font-family: "Inter", serif;
+}
+button{
+    position: relative;
+    padding: 10px;
+    margin: 10px 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.329);
+}
+.up_btn{
+    padding: 5px 10px;
+    margin: 3px 0px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.329);
+}
+select{
+    padding: 3px;
+    font-size: 15px;
+    border: 1px solid rgba(0, 0, 0, 0.329);
+    border-radius: 5px;
+}
+.container{
+    margin-top: 30px;
+}
+h1{
+    text-align: center;
+}
+.td{
+    text-align: center;
+}
+td{
+    padding: 0 10px;
+}
+table{
+    width: 95%;
+    margin: auto;
+}
+.ttd{
+    text-align: center;
+    font-size: 25px;
+}
+th, td{
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.39);
+}
+.card-container{
+    width: 90%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+}
+.card-container > a{
+    padding: 20px 30px;
+    cursor: pointer;
+}
+.card{
+    margin: auto;
+}
+.atag{
+    text-align: center;
+    padding: 20px 30px; 
+    text-decoration: none;
+    display: flex;
+    justify-content: space-evenly;
+    border: 1px solid rgba(0, 0, 0, 0.39);
+    border-radius: 10px;
+}
+.pending, .pend, .colp{
+    background-color: rgb(243, 241, 142);
+    color: rgb(0, 0, 0);
+    border-radius: 10px;
+    font-size: 20px;
+}
+.processing, .proc, .colpr{
+    background-color: rgb(142, 203, 243);
+    color: rgb(0, 0, 0);
+    border-radius: 10px;
+    font-size: 20px;
+}
+.in-transit, .tran, .colt{
+    background-color: rgb(243, 203, 142);
+    color: rgb(0, 0, 0);
+    border-radius: 10px;
+    font-size: 20px;
+}
+.delivered, .deli, .cold{
+    background-color: rgb(171, 243, 142);
+    color: rgb(0, 0, 0);
+    border-radius: 10px;
+    font-size: 20px;
+}
+.cancelled, .canc, .colc{
+    background-color: rgb(243, 142, 142);
+    color: rgb(0, 0, 0);
+    border-radius: 10px;
+    font-size: 20px;
+}

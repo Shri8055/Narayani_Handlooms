@@ -230,7 +230,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
                 </li>
                 <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
                 <a href="custom_order.php"><li>CUSTOMISED ORDER</li></a>
-                <a href="bulk_order.php"><li>BULK ORDER</li></a>
+                <a href="orders.php"><li>YOUR ORDERS</li></a>
                 <a href="home.php#about-us"><li>ABOUT US</li></a>
                 <a href="contact.php"><li>CONTACT US</li></a>
             </ul>
