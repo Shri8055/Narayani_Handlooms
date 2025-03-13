@@ -1,5 +1,10 @@
 <?php
 session_start();
+$conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
 if (!isset($_SESSION['user_id'])) {
     echo "<script>
             alert('Please log in to continue.');
@@ -7,22 +12,19 @@ if (!isset($_SESSION['user_id'])) {
           </script>";
     exit;
 }
-$total_price=0;
-$conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+
+$total_price = 0;
+$user_id = $_SESSION['user_id'];
+
 if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
     $checkout_items = $_SESSION['buy_now'];
     foreach ($checkout_items as $item) {
         $total_price += $item['bn_price'] * $item['bn_quantity'];
-        $_SESSION['total_price']=$total_price;
+        $_SESSION['total_price'] = $total_price;
     }
     unset($_SESSION['buy_now']);
-    unset($_SESSION['total_price']);
 } else {
     $checkout_items = [];
-    $user_id = $_SESSION['user_id'];
     $cart_query = "SELECT * FROM cart WHERE user_id = $user_id";
     $cart_result = mysqli_query($conn, $cart_query);
     
@@ -34,14 +36,13 @@ if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
             'bn_quantity' => $cart_row['quantity']
         ];
         $total_price += $cart_row['product_price'] * $cart_row['quantity'];
-        $_SESSION['total_price']=$total_price;
+        $_SESSION['total_price'] = $total_price;
     }
 }
-$user_id = $_SESSION['user_id']; 
-$total_price = $_SESSION['total_price']; 
+
 $order_status = "Pending";
 
-if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])){
+if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
     $followup = mysqli_real_escape_string($conn, $_POST['folwup']);
     $country = mysqli_real_escape_string($conn, $_POST['country']);
     $f_name = mysqli_real_escape_string($conn, $_POST['first_name']);
@@ -56,35 +57,46 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])){
     $phone_no = mysqli_real_escape_string($conn, $_POST['ph_no']);
     $ship_instr = mysqli_real_escape_string($conn, $_POST['ship_instru']);
     $total_price = $_SESSION['total_price'] ?? 0;
-    $user_id = $_SESSION['user_id'];
-    $user_F_name=$f_name . " " . $l_name;
-    $_SESSION['user_name']=$user_F_name;
+    $user_F_name = $f_name . " " . $l_name;
+    $_SESSION['user_name'] = $user_F_name;
+
     if (empty($f_name) || empty($l_name) || empty($address) || empty($state) || empty($city) || empty($pincode) || empty($phone_no)) {
         echo "<script>alert('Please fill all required fields'); window.location.href='checkout.php';</script>";
     } else {
+        // Insert order into orders table
         $insert_query = "INSERT INTO orders (
             user_id, followup, country, first_name, last_name, company, 
             address, extra_address, state, city, pin_code, 
-            phone_country_code, phone_number, shipping_instructions, total_price
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            phone_country_code, phone_number, shipping_instructions, total_price, order_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = mysqli_prepare($conn, $insert_query);
-        mysqli_stmt_bind_param($stmt, "isssssssssssssd", $user_id, $followup, $country, $f_name, $l_name, $company, $address, $e_address, $state, $city, $pincode, $ph_code, $phone_no, $ship_instr, $total_price);
+        mysqli_stmt_bind_param($stmt, "issssssssssssdss", $user_id, $followup, $country, $f_name, $l_name, $company, $address, $e_address, $state, $city, $pincode, $ph_code, $phone_no, $ship_instr, $total_price, $order_status);
 
         if (mysqli_stmt_execute($stmt)) {
+            $order_id = mysqli_insert_id($conn); // Get last inserted order_id
             mysqli_stmt_close($stmt);
-    
-            // Retrieve the last order_id
-            $order_query = "SELECT order_id FROM orders WHERE user_id = ? ORDER BY order_id DESC LIMIT 1";
-            $stmt = mysqli_prepare($conn, $order_query);
-            mysqli_stmt_bind_param($stmt, "i", $user_id);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_bind_result($stmt, $order_id);
-            mysqli_stmt_fetch($stmt);
-            mysqli_stmt_close($stmt);
-    
+
             if ($order_id) {
                 $_SESSION['order_id'] = $order_id;
+
+                // Insert ordered items into order_items table
+                $insert_item = "INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)";
+                $stmt_item = $conn->prepare($insert_item);
+
+                foreach ($checkout_items as $product_id => $item) {
+                    $quantity = $item['bn_quantity'];
+                    $unit_price = $item['bn_price'];
+                    $subtotal = $quantity * $unit_price;
+
+                    $stmt_item->bind_param("iiidd", $order_id, $product_id, $quantity, $unit_price, $subtotal);
+                    $stmt_item->execute();
+                }
+                $stmt_item->close();
+
+                // Clear cart after order
+                unset($_SESSION['cart']);
+
                 echo "<script>window.location.href='qr_payment.php?order_id=" . $order_id . "';</script>";
                 exit();
             } else {
@@ -97,6 +109,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])){
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -147,7 +147,7 @@ $result = mysqli_query($conn, $query);
                 </li>
                 <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
                 <a href="#"><li>CUSTOMISED ORDER</li></a>
-                <a href="#"><li>YOUR ORDERS</li></a>
+                <a href="your_orders.php"><li>YOUR ORDERS</li></a>
                 <a href="home.php#about-us"><li>ABOUT US</li></a>
                 <a href="contact_us.php"><li>CONTACT US</li></a>
             </ul>

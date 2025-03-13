@@ -48,6 +48,7 @@ td{
 table{
     width: 95%;
     margin: auto;
+    margin-bottom: 40px;
 }
 .ttd{
     text-align: center;
