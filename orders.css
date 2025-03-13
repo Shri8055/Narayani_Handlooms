@@ -26,6 +26,12 @@ select{
     font-size: 15px;
     border: 1px solid rgba(0, 0, 0, 0.329);
     border-radius: 5px;
+    cursor: pointer;
+}
+#payment{
+    font-size: 20px;
+    display: flex;
+    margin: auto;
 }
 .container{
     margin-top: 30px;

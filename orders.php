@@ -42,7 +42,6 @@
         if (mysqli_query($conn, $update_query)) {
             header("Location: orders.php?order_type=$selected_order_type"); // Maintain filter
             exit();
-        } else {
         }
     }
 ?>
@@ -71,22 +70,25 @@
     </div>
 
     <div class="container">
-        <h1>Orders (Total: <?php echo $_SESSION['order_count']; ?>) - <?php 
+        <h1>Total Orders : <?php echo $_SESSION['order_count'] . " , "; ?>  <?php 
                                                                         echo $selected_order_type; 
-                                                                        if($selected_order_type=='Pending'){
-                                                                            echo " (Total: " . $_SESSION['pending_count'] . ")";
+                                                                        if($selected_order_type=='Pending'){ 
+                                                                            echo " : " . $_SESSION['pending_count'];
                                                                         }
                                                                         else if($selected_order_type=='Processing'){
-                                                                            echo " (Total: " . $_SESSION['processing_count'] . ")";
+                                                                            echo " : " . $_SESSION['processing_count'];
                                                                         }
                                                                         else if($selected_order_type=='In Transit'){
-                                                                            echo " (Total: " . $_SESSION['transit_count'] . ")";
+                                                                            echo " : " . $_SESSION['transit_count'];
                                                                         }
                                                                         else if($selected_order_type=='Delivered'){
-                                                                            echo " (Total: " . $_SESSION['delivered_count'] . ")";
+                                                                            echo " : " . $_SESSION['delivered_count'];
+                                                                        }
+                                                                        else if($selected_order_type=='Cancelled'){
+                                                                            echo " : " . $_SESSION['cancelled_count'];
                                                                         }
                                                                         else{
-                                                                            echo " (Total: " . $_SESSION['cancelled_count'] . ")";
+                                                                            echo "";
                                                                         }
                                                                       ?></h1><hr>
         <table>
