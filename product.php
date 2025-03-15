@@ -44,38 +44,58 @@ if (isset($_SESSION['user_id'])) {
 }
 // buy now
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
-  $_SESSION['sel_product_id'] = $_POST['product_id'];
+  session_start();
+  $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
+  if (!$conn) {
+      die("Connection failed: " . mysqli_connect_error());
+  }
   if (!isset($_SESSION['user_id'])) {
-    echo "<script>
-              alert('Please Sign-in / Log-in to proceed.');
-              window.location.href='product.php?id=" . $_SESSION['sel_product_id'] . "';
-          </script>";
+      echo "<script>
+                alert('Please Sign-in / Log-in to proceed.');
+                window.location.href='product.php?id=" . $_POST['product_id'] . "';
+            </script>";
       exit;
   }
-  $bn_user_id=$_SESSION['user_id'];
-  $bn_product_id=(int) $_POST['buy_now_product_id'];
-  $bn_product_name=mysqli_real_escape_string($conn, $_POST['buy_now_product_name']);
-  $bn_product_price=(float) $_POST['buy_now_product_price'];
-  $bn_product_image = mysqli_real_escape_string($conn, $_POST['buy_now_product_image']);
-  $bn_quantity = isset($_POST['quantity']) ? (int) $_POST['quantity'] : 1;
-  if ($bn_product_id <= 0 || empty($bn_product_name) || $bn_product_price <= 0 || empty($bn_product_image)) {
-    echo "<script>alert('Invalid product details.');</script>";
-    exit;
+
+  $user_id = $_SESSION['user_id'];
+  $product_id = (int)$_POST['buy_now_product_id'];
+  $product_name = mysqli_real_escape_string($conn, $_POST['buy_now_product_name']);
+  $product_price = (float)$_POST['buy_now_product_price'];
+  $product_image = mysqli_real_escape_string($conn, $_POST['buy_now_product_image']);
+  $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
+
+  if ($product_id <= 0 || empty($product_name) || $product_price <= 0 || empty($product_image)) {
+      echo "<script>alert('Invalid product details.');</script>";
+      exit;
   }
-  if(!isset($_SESSION['buy_now']) || !is_array($_SESSION['buy_now'])) {
-    $_SESSION['buy_now'] = [];
-  }
-  if (isset($_SESSION['buy_now'][$bn_product_id])) {
-    $_SESSION['buy_now'][$bn_product_id]['buy_now_quantity'] += $bn_quantity;
+
+  $check_query = "SELECT * FROM buynow WHERE user_id = ?";
+  $stmt = mysqli_prepare($conn, $check_query);
+  mysqli_stmt_bind_param($stmt, "i", $user_id);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  $existing_item = mysqli_fetch_assoc($result);
+  mysqli_stmt_close($stmt);
+  $_SESSION['buy_now'] = 'clicked';
+  if ($existing_item) {
+
+      $update_query = "UPDATE buynow SET product_id = ?, product_name = ?, product_price = ?, product_image = ?, quantity = ?
+                       WHERE user_id = ?";
+      $stmt = mysqli_prepare($conn, $update_query);
+      mysqli_stmt_bind_param($stmt, "isdsii", $product_id, $product_name, $product_price, $product_image, $quantity, $user_id);
   } else {
-      $_SESSION['buy_now'][$bn_product_id] = [
-          'bn_name' => $bn_product_name,
-          'bn_price' => $bn_product_price,
-          'bn_image' => $bn_product_image,
-          'bn_quantity' => $bn_quantity
-      ];
+      
+      $insert_query = "INSERT INTO buynow (user_id, product_id, product_name, product_price, product_image, quantity)
+                       VALUES (?, ?, ?, ?, ?, ?)";
+      $stmt = mysqli_prepare($conn, $insert_query);
+      mysqli_stmt_bind_param($stmt, "iisdsd", $user_id, $product_id, $product_name, $product_price, $product_image, $quantity);
   }
-  header('Location: checkout.php');
+
+  mysqli_stmt_execute($stmt);
+  mysqli_stmt_close($stmt);
+  mysqli_close($conn);
+
+  header("Location: checkout.php");
   exit;
 }
 // add to cart

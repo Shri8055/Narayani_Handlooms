@@ -1,9 +1,20 @@
 <?php
     session_start();
+    $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
     if (!isset($_SESSION['admin'])) {
-        header("Location: admin_login.php");
+        header("Location: home.php");
         exit();
     }
+    $order_count = "SELECT COUNT(order_id) AS ototal FROM orders";
+    $Ores = mysqli_query($conn, $order_count);
+    $Orow = mysqli_fetch_assoc($Ores);
+
+    $contact_count = "SELECT COUNT(id) AS ctotal FROM contact";
+    $Cres = mysqli_query($conn, $contact_count);
+    $Crow = mysqli_fetch_assoc($Cres);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,10 +36,9 @@
         <ul>
             <li><a href="upload.php">Add product</a></li>
             <li>Add offers</li>
-            <li><a href="orders.php">Orders<span class="cart-value"><?php echo $_SESSION['order_count'] ?? '0'; ?></span></a></li>
+            <li><a href="orders.php">Orders<span class="cart-value"><?php echo $Orow['ototal'] ?? '0'; ?></span></a></li>
             <li>Refunds inside orders(returned)<span class="cart-value">0</span></li>
-            <li><a href="admin_contact.php">Contact<span class="cart-value"><?php echo $_SESSION['contact_count'] ?? '0'; ?></span></a></li>
-            <li>Bulk orders<span class="cart-value">99</span></li>
+            <li><a href="admin_contact.php">Contact<span class="cart-value"><?php echo $Crow['ctotal'] ?? '0'; ?></span></a></li>
             <ol>
                 <li>
                     <div class="logout-a">

@@ -22,6 +22,33 @@ if (isset($_SESSION['user_id'])) {
         $cart_count += $item['quantity'];
     }
 }
+if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['wa_sub'])){
+  $user_id=$_SESSION['user_id'];
+  $whatsAppNo=mysqli_real_escape_string($conn, $_POST['wa_ph_no']);
+  $update_query = "UPDATE users SET user_ph_no='$whatsAppNo' WHERE user_id='$user_id'";
+  if(mysqli_query($conn, $update_query)) {
+    echo "<script>
+            alert('WhatsApp Number Sent!\\nWill notify about new products and offers');
+            window.location.href = 'home.php';
+          </script>";
+      exit();
+  }else{
+    echo "Error updating record: " . mysqli_error($conn);
+  }
+}
+if (isset($_SESSION['user_id'])) {
+  $user_id = $_SESSION['user_id'];
+
+  // Check if user_id already exists
+  $check_query = "SELECT * FROM buynow WHERE user_id = $user_id";
+  $result = mysqli_query($conn, $check_query);
+
+  if (mysqli_num_rows($result) == 0) {
+      // Insert user_id only (no product data yet)
+      $insert_query = "INSERT INTO buynow (user_id) VALUES ('$user_id')";
+      mysqli_query($conn, $insert_query);
+  }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -259,8 +286,11 @@ if (isset($_SESSION['user_id'])) {
           <section class="footer-container">
             <div class="footer-left-container">
               <u><label for="input-wno"><p class="ptag">Get notified first ↓</p></label></u><br>
-              <input type="number" class="input" id="input-wno" placeholder="Enter WhatsApp Number">
-              <input type="submit" class="button"></input>
+              <form method="POST" id="form">
+                <input type="number" name="wa_ph_no" class="input" id="input-wno" placeholder="WhatsApp Number">
+                <input type="submit" name="wa_sub" class="button"></input>
+                <p><i>*WRITE COUNTRY CODE</i></p>
+              </form>
             </div>
             <div class="footer-right-container">
               <u><p>Quick Links</p></u>

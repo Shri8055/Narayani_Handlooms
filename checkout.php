@@ -15,30 +15,51 @@ if (!isset($_SESSION['user_id'])) {
 
 $total_price = 0;
 $user_id = $_SESSION['user_id'];
+$checkout_items = [];
 
-if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
-    $checkout_items = $_SESSION['buy_now'];
-    foreach ($checkout_items as $item) {
-        $total_price += $item['bn_price'] * $item['bn_quantity'];
-        $_SESSION['total_price'] = $total_price;
+if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
+    $query = "SELECT * FROM buynow WHERE user_id = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($result)) {
+        $checkout_items[] = [
+            'product_id' => $row['product_id'],  // Include product ID
+            'bn_name' => $row['product_name'],
+            'bn_price' => $row['product_price'],
+            'bn_image' => $row['product_image'],
+            'bn_quantity' => $row['quantity']
+        ];
+        $total_price = $row['product_price'] * $row['quantity'];
     }
-    unset($_SESSION['buy_now']);
-} else {
-    $checkout_items = [];
-    $cart_query = "SELECT * FROM cart WHERE user_id = $user_id";
-    $cart_result = mysqli_query($conn, $cart_query);
-    
+
+    mysqli_stmt_close($stmt);
+} 
+else {
+    $cart_query = "SELECT * FROM cart WHERE user_id = ?";
+    $stmt = mysqli_prepare($conn, $cart_query);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $cart_result = mysqli_stmt_get_result($stmt);
+
     while ($cart_row = mysqli_fetch_assoc($cart_result)) {
-        $checkout_items[$cart_row['product_id']] = [
+        $checkout_items[] = [
+            'product_id' => $cart_row['product_id'],  // Include product ID
             'bn_name' => $cart_row['product_name'],
             'bn_price' => $cart_row['product_price'],
             'bn_image' => $cart_row['product_image'],
             'bn_quantity' => $cart_row['quantity']
         ];
         $total_price += $cart_row['product_price'] * $cart_row['quantity'];
-        $_SESSION['total_price'] = $total_price;
     }
+
+    mysqli_stmt_close($stmt);
 }
+
+
+$_SESSION['total_price'] = $total_price;
 
 $order_status = "Pending";
 
@@ -79,24 +100,25 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
 
             if ($order_id) {
                 $_SESSION['order_id'] = $order_id;
-
+            
                 // Insert ordered items into order_items table
                 $insert_item = "INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)";
                 $stmt_item = $conn->prepare($insert_item);
-
-                foreach ($checkout_items as $product_id => $item) {
+            
+                foreach ($checkout_items as $item) {  // Use correct array structure
+                    $product_id = $item['product_id'];  // Fetch product_id correctly
                     $quantity = $item['bn_quantity'];
                     $unit_price = $item['bn_price'];
                     $subtotal = $quantity * $unit_price;
-
+            
                     $stmt_item->bind_param("iiidd", $order_id, $product_id, $quantity, $unit_price, $subtotal);
                     $stmt_item->execute();
                 }
                 $stmt_item->close();
-
+            
                 // Clear cart after order
                 unset($_SESSION['cart']);
-
+            
                 echo "<script>window.location.href='qr_payment.php?order_id=" . $order_id . "';</script>";
                 exit();
             } else {
@@ -120,6 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body { margin: 20px; }
         .product-container { display: flex; align-items: center; margin-bottom: 20px; }
@@ -134,8 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
             <label for="contact" class="contact-head">Contact</label>
             <input type="text" id="contact" class="contact" name="folwup" placeholder="Email / Mobile number (Optional)" ><br>
             <div class="checkbox">
-                <input type="checkbox" id="checkbox">
-                <label for="checkbox">Email me with news and offers</label><br>
+                <p><i>*Email me with news and offers.</i></p><br>
             </div><hr>
 
             <label for="country" class="country-head">Delivery</label>
@@ -295,8 +317,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
                         <option value="ZAF +27">South Africa (+27)</option>
                         <option value="ZMB +260">Zambia (+260)</option>
                         <option value="ZWE +263">Zimbabwe (+263)</option>                        
-                </select>
-                <input type="text" id="phone-input" name="ph_no" placeholder="Phone number, If needed to contact about order" required>
+                </select><span><i class="fa-brands fa-whatsapp"></i></span>
+                <input type="text" id="phone-input" name="ph_no" placeholder="WhatsApp number, If needed to contact about order" required>
             </div>
             
             <label for="ship-instru">Shipping instruction:</label>

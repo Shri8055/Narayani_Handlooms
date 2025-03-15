@@ -112,12 +112,15 @@
             <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                 <?php 
                     $full_name = $row['first_name'] . ' ' . $row['last_name'];
+                    $_SESSION['username']=$full_name;
                     $ph_no = $row['phone_country_code'] . ' ' . $row['phone_number'];
                     $add = $row['address'] . ' ' . $row['extra_address'];
                 ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($row['order_id']); ?></td>
-                    <td><?php echo htmlspecialchars($row['user_id']); ?></td>
+                <td class="td"><a href="view_order.php?order_id=<?php echo htmlspecialchars($row['order_id']); ?>">
+                    <?php echo htmlspecialchars($row['order_id']); ?>
+                </a></td>
+                    <td class="td"><?php echo htmlspecialchars($row['user_id']); ?></td>
                     <td><?php echo htmlspecialchars($row['followup']); ?></td>
                     <td><?php echo htmlspecialchars($row['country']); ?></td>
                     <td><?php echo htmlspecialchars($full_name); ?></td>
@@ -128,20 +131,20 @@
                     <td><?php echo htmlspecialchars($row['pin_code']); ?></td>
                     <td><?php echo htmlspecialchars($ph_no); ?></td>
                     <td><?php echo htmlspecialchars($row['shipping_instructions']); ?></td>
-                    <td><?php echo htmlspecialchars($row['total_price']); ?></td>
+                    <td><?php echo htmlspecialchars($row['total_price']);?></td>
                     <td>
                         <form method="POST">
                             <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
                             <select name="order_status" onchange="this.form.submit()">
-                                <option value="Pending" <?php if ($row['order_status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-                                <option value="Processing" <?php if ($row['order_status'] == 'Processing') echo 'selected'; ?>>Processing</option>
-                                <option value="In Transit" <?php if ($row['order_status'] == 'In Transit') echo 'selected'; ?>>In Transit</option>
-                                <option value="Delivered" <?php if ($row['order_status'] == 'Delivered') echo 'selected'; ?>>Delivered</option>
-                                <option value="Cancelled" <?php if ($row['order_status'] == 'Cancelled') echo 'selected'; ?>>Cancelled</option>
+                                <option value="Pending" style="background-color:rgb(243, 241, 142);" <?php if ($row['order_status'] == 'Pending') echo 'selected'; ?>>Pending</option>
+                                <option value="Processing" style="background-color:rgb(142, 203, 243);" <?php if ($row['order_status'] == 'Processing') echo 'selected'; ?>>Processing</option>
+                                <option value="In Transit" style="background-color:rgb(243, 203, 142);" <?php if ($row['order_status'] == 'In Transit') echo 'selected'; ?>>In Transit</option>
+                                <option value="Delivered" style="background-color:rgb(171, 243, 142);" <?php if ($row['order_status'] == 'Delivered') echo 'selected'; ?>>Delivered</option>
+                                <option value="Cancelled" style="background-color:rgb(243, 142, 142);" <?php if ($row['order_status'] == 'Cancelled') echo 'selected'; ?>>Cancelled</option>
                             </select>
                         </form>
                     </td>
-                    <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+                    <td class="td"><?php echo htmlspecialchars($row['created_at']); ?></td>
                 </tr>
             <?php } ?>
         </table>

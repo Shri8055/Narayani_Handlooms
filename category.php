@@ -21,6 +21,19 @@ if (isset($_SESSION['user_id'])) {
         $cart_count += $item['quantity'];
     }
 }
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+  
+    // Check if user_id already exists
+    $check_query = "SELECT * FROM buynow WHERE user_id = $user_id";
+    $result = mysqli_query($conn, $check_query);
+  
+    if (mysqli_num_rows($result) == 0) {
+        // Insert user_id only (no product data yet)
+        $insert_query = "INSERT INTO buynow (user_id) VALUES ('$user_id')";
+        mysqli_query($conn, $insert_query);
+    }
+  }
 // Check if category is set
 if (!isset($_GET['category']) || empty($_GET['category'])) {
     echo "<h2>Invalid category</h2>";
@@ -50,6 +63,8 @@ if ($category === 'Bags') {
     $query = "SELECT * FROM products WHERE genre = '$category' ORDER BY RAND()";
 }
 $result = mysqli_query($conn, $query);
+
+
 ?>
 
 <!DOCTYPE html>

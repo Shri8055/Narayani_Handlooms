@@ -228,3 +228,11 @@ li{
     border-radius: 50%;
     background-color: rgba(128, 128, 128, 0.361);
 }
+span > i{
+    background-color: #05a884;
+    padding: 10px;
+    color: white;
+    margin: 0px 0px 0px 10px;
+    font-size: 30px;
+    border-radius: 5px;
+}

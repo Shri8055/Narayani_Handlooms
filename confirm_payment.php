@@ -48,6 +48,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         die("Error inserting data: " . mysqli_stmt_error($stmt));
     }
 }
+if (isset($_POST['confirm_payment'])) {
+    $user_id = $_SESSION['user_id'];
+
+    $delete_query = "DELETE FROM buynow WHERE user_id = '$user_id'";
+    mysqli_query($conn, $delete_query);
+
+    header("Location: home.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -78,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         
         <label for="">Exact Time of transaction:</label>
         <input type="time" id="transaction_time" name="transaction_time" required><br><br>
-        <button type="submit">Confirm Payment</button>
+        <button type="submit" name="confirm_payment">Confirm Payment</button>
     </form>
 </div>
 </body>

@@ -111,3 +111,16 @@ th, td{
     border-radius: 10px;
     font-size: 20px;
 }
+td > a{
+    padding: 10px 13px;
+    border: 1px solid black;
+    text-decoration: none;
+    border-radius: 20px;
+    color: blue;
+}
+h2, h3, .orders-table{
+    text-align: center;
+}
+h2{
+    margin-bottom: 10px;
+}
