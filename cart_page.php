@@ -28,6 +28,7 @@ if (isset($_POST['checkout_cart'])) {
     header("Location: checkout.php");
     exit;
 }
+unset($_SESSION['buy_now']);
 ?>
 <!DOCTYPE html>
 <html lang="en">

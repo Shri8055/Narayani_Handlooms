@@ -13,10 +13,11 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$total_price = 0;
 $user_id = $_SESSION['user_id'];
 $checkout_items = [];
+$total_price = 0;
 
+// Check if "Buy Now" was clicked
 if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
     $query = "SELECT * FROM buynow WHERE user_id = ?";
     $stmt = mysqli_prepare($conn, $query);
@@ -26,17 +27,17 @@ if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
 
     if ($row = mysqli_fetch_assoc($result)) {
         $checkout_items[] = [
-            'product_id' => $row['product_id'],  // Include product ID
+            'product_id' => $row['product_id'],
             'bn_name' => $row['product_name'],
             'bn_price' => $row['product_price'],
             'bn_image' => $row['product_image'],
             'bn_quantity' => $row['quantity']
         ];
-        $total_price = $row['product_price'] * $row['quantity'];
+        $total_price += $row['product_price'] * $row['quantity'];
     }
     mysqli_stmt_close($stmt);
-} 
-else {
+} else {
+    // If "Buy Now" was NOT clicked, show cart items
     $cart_query = "SELECT * FROM cart WHERE user_id = ?";
     $stmt = mysqli_prepare($conn, $cart_query);
     mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -45,7 +46,7 @@ else {
 
     while ($cart_row = mysqli_fetch_assoc($cart_result)) {
         $checkout_items[] = [
-            'product_id' => $cart_row['product_id'],  // Include product ID
+            'product_id' => $cart_row['product_id'],
             'bn_name' => $cart_row['product_name'],
             'bn_price' => $cart_row['product_price'],
             'bn_image' => $cart_row['product_image'],
@@ -53,13 +54,10 @@ else {
         ];
         $total_price += $cart_row['product_price'] * $cart_row['quantity'];
     }
-
     mysqli_stmt_close($stmt);
 }
 
-
 $_SESSION['total_price'] = $total_price;
-
 $order_status = "Pending";
 
 if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
@@ -85,7 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
     if (empty($f_name) || empty($l_name) || empty($address) || empty($state) || empty($city) || empty($pincode) || empty($phone_no)) {
         echo "<script>alert('Please fill all required fields'); window.location.href='checkout.php';</script>";
     } else {
-        // Insert order into orders table
         $insert_query = "INSERT INTO orders (
             user_id, followup, country, first_name, last_name, company, 
             address, extra_address, state, city, pin_code, 
@@ -94,21 +91,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
 
         $stmt = mysqli_prepare($conn, $insert_query);
         mysqli_stmt_bind_param($stmt, "issssssssssssdss", $user_id, $followup, $country, $f_name, $l_name, $company, $address, $e_address, $state, $city, $pincode, $ph_code, $phone_no, $ship_instr, $total_price, $order_status);
+        
         $update_user = "UPDATE users SET user_name='$user_F_name', user_ph_no='$user_Fph_no', user_address='$user_Fadd' WHERE user_id=$user_id";
         mysqli_query($conn, $update_user);
+        
         if (mysqli_stmt_execute($stmt)) {
-            $order_id = mysqli_insert_id($conn); // Get last inserted order_id
+            $order_id = mysqli_insert_id($conn);
             mysqli_stmt_close($stmt);
 
             if ($order_id) {
                 $_SESSION['order_id'] = $order_id;
             
-                // Insert ordered items into order_items table
                 $insert_item = "INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)";
                 $stmt_item = $conn->prepare($insert_item);
             
-                foreach ($checkout_items as $item) {  // Use correct array structure
-                    $product_id = $item['product_id'];  // Fetch product_id correctly
+                foreach ($checkout_items as $item) {
+                    $product_id = $item['product_id'];
                     $quantity = $item['bn_quantity'];
                     $unit_price = $item['bn_price'];
                     $subtotal = $quantity * $unit_price;
@@ -120,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
             
                 // Clear cart after order
                 unset($_SESSION['cart']);
+                unset($_SESSION['buy_now']); // Reset Buy Now flag after checkout
             
                 echo "<script>window.location.href='qr_payment.php?order_id=" . $order_id . "';</script>";
                 exit();
@@ -133,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
