@@ -124,3 +124,14 @@ h2, h3, .orders-table{
 h2{
     margin-bottom: 10px;
 }
+i{
+    background-color: rgb(241, 39, 80);
+    color: rgba(255, 255, 255, 0.911);
+    padding: 10px 12px;
+    border-radius: 40px;
+    cursor: pointer;
+}
+.td-a > a{
+    border: none;
+    padding: 0px;
+}

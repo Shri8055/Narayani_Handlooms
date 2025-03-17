@@ -34,7 +34,6 @@ if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
         ];
         $total_price = $row['product_price'] * $row['quantity'];
     }
-
     mysqli_stmt_close($stmt);
 } 
 else {
@@ -79,6 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
     $ship_instr = mysqli_real_escape_string($conn, $_POST['ship_instru']);
     $total_price = $_SESSION['total_price'] ?? 0;
     $user_F_name = $f_name . " " . $l_name;
+    $user_Fph_no = $ph_code . " " . $phone_no;
+    $user_Fadd = $address . " " . $e_address;
     $_SESSION['user_name'] = $user_F_name;
 
     if (empty($f_name) || empty($l_name) || empty($address) || empty($state) || empty($city) || empty($pincode) || empty($phone_no)) {
@@ -93,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
 
         $stmt = mysqli_prepare($conn, $insert_query);
         mysqli_stmt_bind_param($stmt, "issssssssssssdss", $user_id, $followup, $country, $f_name, $l_name, $company, $address, $e_address, $state, $city, $pincode, $ph_code, $phone_no, $ship_instr, $total_price, $order_status);
-
+        $update_user = "UPDATE users SET user_name='$user_F_name', user_ph_no='$user_Fph_no', user_address='$user_Fadd' WHERE user_id=$user_id";
+        mysqli_query($conn, $update_user);
         if (mysqli_stmt_execute($stmt)) {
             $order_id = mysqli_insert_id($conn); // Get last inserted order_id
             mysqli_stmt_close($stmt);

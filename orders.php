@@ -35,15 +35,39 @@
 
     // Update order status
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['order_id'], $_POST['order_status'])) {
-        $order_id = $_POST['order_id'];
+        $order_id = intval($_POST['order_id']); // Ensure integer type
         $order_status = $_POST['order_status'];
-
-        $update_query = "UPDATE orders SET order_status='$order_status' WHERE order_id='$order_id'";
-        if (mysqli_query($conn, $update_query)) {
-            header("Location: orders.php?order_type=$selected_order_type"); // Maintain filter
-            exit();
+    
+        error_log("Updating Order ID: " . $order_id); // Debugging: Check order ID
+    
+        // Prepare the UPDATE query for product count only if status is "In Transit"
+        if ($order_status == "In Transit") {
+            $update_products_query = "
+                UPDATE products p
+                JOIN order_items oi ON p.product_id = oi.product_id
+                JOIN orders o ON oi.order_id = o.order_id
+                SET p.product_count = p.product_count + oi.quantity
+                WHERE o.order_id = ?
+            ";
+    
+            $stmt = mysqli_prepare($conn, $update_products_query);
+            mysqli_stmt_bind_param($stmt, "i", $order_id);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
         }
+    
+        // Update the order status AFTER updating product count
+        $update_order_query = "UPDATE orders SET order_status = ? WHERE order_id = ?";
+        $stmt = mysqli_prepare($conn, $update_order_query);
+        mysqli_stmt_bind_param($stmt, "si", $order_status, $order_id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    
+        // Redirect to maintain the selected filter
+        header("Location: orders.php?order_type=$selected_order_type");
+        exit();
     }
+    
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,6 +79,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <a href="admin_dash.php"><button>BACK ↩️</button></a>
@@ -108,11 +133,11 @@
                 <th>Total Price</th>
                 <th>Order Status</th>
                 <th>Date & Time</th>
+                <th>DELETE</th>
             </tr>
             <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                 <?php 
                     $full_name = $row['first_name'] . ' ' . $row['last_name'];
-                    $_SESSION['username']=$full_name;
                     $ph_no = $row['phone_country_code'] . ' ' . $row['phone_number'];
                     $add = $row['address'] . ' ' . $row['extra_address'];
                 ?>
@@ -145,6 +170,7 @@
                         </form>
                     </td>
                     <td class="td"><?php echo htmlspecialchars($row['created_at']); ?></td>
+                    <td class="td-a"><a href="del_order.php?order_id=<?php echo htmlspecialchars($row['order_id']); ?>"><i class="fa-solid fa-xmark"></i></a></td>
                 </tr>
             <?php } ?>
         </table>

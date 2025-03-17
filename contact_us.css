@@ -2,6 +2,8 @@
     margin: 0;
     padding: 0;
     font-family: "Inter", serif;
+}
+body > form{
     background-color: #f6f5f4;
 }
 hr{
@@ -10,9 +12,8 @@ hr{
 }
 .main-container{
     display: flex;
-    align-items: center;
     justify-content: center;
-    height: 80vh;
+    height: 65vh;
 }
 label{
     font-size: 20px;
@@ -62,3 +63,380 @@ p{
     margin-bottom: -40px;
     color: rgba(0, 0, 0, 0.611);
 }
+.form{
+  margin-top: 20px;
+}
+.back-btn > a{
+  position: absolute;
+}
+
+header{
+    background-color: black;
+    text-align: center;
+    color: white;
+    font-weight: 100;
+    padding: 20px 0;
+  }
+  body{
+    background-color: #f5f5f5;
+  }
+  .text-center{
+    background-color: #f5f5f5;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .collection > h2{
+    background-color: #f5f5f5;
+  }
+  .logo-img{
+    width: 200px;
+    height: 200px;
+  }
+  .cart-value{
+  position: absolute;
+  background-color: red;
+  color: white;
+  margin-top: -15px;
+  padding: 5px 8px;
+  border-radius: 50%;
+  }
+  header{
+  background-color: black;
+  }
+  .banner{
+  background-color: black;
+  font-size: 1.1rem;
+  }
+  .sec1-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+  .sec1-container a{
+  position: relative;
+  display: inline-block;
+  outline: none;
+  }
+  .sec1-container a i::after{
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: 120%;
+  transform: translateX(-50%);
+  background: rgba(58, 58, 58, 0.643);
+  color: white;
+  padding: 5px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+  font-family: "Inter", serif;
+  font-weight: 400;
+  }
+  .sec1-container a:hover i::after{
+  opacity: 1;
+  visibility: visible;
+  }
+  
+  .left-inner-sec1-container, .right-inner-sec1-container{
+  padding: 10px 0;
+  }
+  .left-inner-sec1-container > a{
+    padding: 10px 13px;
+    margin: 0 10px;
+    border: 1px solid rgba(0, 0, 0, 0.145);
+    border-radius: 50%;
+    text-decoration: none;
+    color: black
+  }
+  .right-inner-sec1-container > a{
+    padding: 10px 13px;
+    margin: 0 10px;
+    border: 1px solid rgba(0, 0, 0, 0.145);
+    border-radius: 50%;
+    text-decoration: none;
+    color: black
+  }
+  i{
+    cursor: pointer;
+  }
+  hr{
+    margin: auto;
+    width: 80%;
+  }
+  body{
+    background-color: #f5f5f5;
+  }
+  .logo-img{
+    width: 200px;
+    height: 200px;
+  }
+  .cart-value{
+  position: absolute;
+  background-color: red;
+  color: white;
+  margin-top: -15px;
+  padding: 5px 8px;
+  border-radius: 50%;
+  }
+  header{
+  background-color: black;
+  }
+  .banner{
+  background-color: black;
+  font-size: 1.1rem;
+  }
+  .sec1-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+  .sec1-container a{
+  position: relative;
+  display: inline-block;
+  outline: none;
+  }
+  .sec1-container a i::after{
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: 120%;
+  transform: translateX(-50%);
+  background: rgba(58, 58, 58, 0.643);
+  color: white;
+  padding: 5px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+  font-family: "Inter", serif;
+  font-weight: 400;
+  }
+  .sec1-container a:hover i::after{
+  opacity: 1;
+  visibility: visible;
+  }
+  ul>a{
+    color: black;
+  }
+  .left-inner-sec1-container, .right-inner-sec1-container{
+  padding: 10px 0;
+  }
+  .left-inner-sec1-container > a{
+    padding: 10px 13px;
+    margin: 0 10px;
+    border: 1px solid rgba(0, 0, 0, 0.145);
+    border-radius: 50%;
+    text-decoration: none;
+    color: black
+  }
+  .right-inner-sec1-container > a{
+    padding: 10px 13px;
+    margin: 0 10px;
+    border: 1px solid rgba(0, 0, 0, 0.145);
+    border-radius: 50%;
+    text-decoration: none;
+    color: black
+  }
+  i{
+    cursor: pointer;
+  }
+  hr{
+    margin: auto;
+    width: 80%;
+  }
+  .quick-links{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  ul{
+    list-style-type: none;
+    margin: 10px 0;
+    padding: 0;
+  }
+  li{
+    display: inline-block;
+    margin: 0px 10px;
+    padding: 5px 10px;
+    position: relative;
+  }
+  li:hover{
+    background-color: rgb(218, 218, 218);
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  .popup{
+    display: none;
+    position: fixed;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  h2{
+    background-color: white;
+  }
+  .popup-content{
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 750px;
+    text-align: center;
+    position: fixed; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  label > i{
+    padding-right: 10px;
+  }
+  .popup-content > img{
+    width: 350px;
+    height: 350px;
+    float: left;
+  }
+  .inner-popup-content{
+    width: 350px;
+    float: right;
+    margin-right: 30px;
+  }
+  .forgot-pass > p{
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+    margin-right: 200px;
+    float: left;
+    border-bottom: 1px solid black;
+  }
+  .close{
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .tabs{
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+    margin-bottom: 15px;
+  }
+  .tablinks{
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    background: lightgray;
+    margin: 0 5px;
+    border-radius: 5px;
+    font-size: 15px;
+  }
+  .tablinks.active{
+    background: #007BFF;
+    color: white;
+  }
+  .tabcontent{
+    display: none;
+  }
+  .tabcontent.active{
+    display: block;
+  }
+  form{
+    background-color: white;
+  }
+  .close{
+    background-color: #ababab;
+    padding: 10px 15px;
+    border-radius: 50%;
+  }
+  /* Form styling */
+  form input {
+    width: 80%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  input{
+    font-size: 16px;
+  }
+  form .login-btn {
+    width: 100%;
+    padding: 10px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 40px;
+  }
+  form .sign-btn {
+    width: 100%;
+    padding: 10px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  form button:hover {
+    background: #0056b3;
+  }
+  /* Style for input container */
+  .input-container {
+    display: flex;
+    align-items: center;
+    background: white;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  
+  /* Style for icons (outside input) */
+  .input-container i {
+    color: #333;
+     /* Fixed width for alignment */
+    text-align: center;
+  }
+  
+  /* Style for input fields */
+  .input-container input {
+    border: 1px solid #ccc;
+    width: 100%;
+    padding: 10px;
+    background: transparent; /* Matches the container */
+  }
+  .dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 5px 0;
+    width: 200px;
+    border-radius: 5px;
+    z-index: 1;
+  }
+  .dropdown li {
+    display: block;
+    padding: 8px 15px;
+    margin: 0;
+  }
+  .dropdown li:hover {
+    background-color: rgb(230, 230, 230);
+  }
+  
+  /* Show dropdown when active */
+  li.active .dropdown {
+    display: block;
+  }
+  .dropdown a{
+    text-decoration: none;
+  }

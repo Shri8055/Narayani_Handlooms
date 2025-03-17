@@ -142,7 +142,7 @@ $result = $stmt->get_result();
 
 <div class="container order-container">
     <h2 class="text-center mb-4">Your Orders</h2>
-
+    
     <?php 
     $currentOrderId = null; 
     $orderTotal = 0; 
@@ -151,15 +151,13 @@ $result = $stmt->get_result();
         $imageSrc = htmlspecialchars($row['product_image']);
         $orderDate = date("d M Y, h:i A", strtotime($row['created_at']));
 
-        // Check if a new order starts
         if ($currentOrderId !== $row['order_id']) { 
             if ($currentOrderId !== null) { 
-                echo "</div>"; // Close previous order div
+                echo "</div>";
             }
             $currentOrderId = $row['order_id']; 
-            $orderTotal = 0; // Reset for new order
+            $orderTotal = 0; 
     ?>
-        <!-- Order Box -->
         <div class="order-box">
             <div class="order-header">
                 <h4>Order ID: <?php echo $row['order_id']; ?></h4>
@@ -170,7 +168,6 @@ $result = $stmt->get_result();
             <hr class="order-hr">
     <?php } ?>
 
-        <!-- Order Items -->
         <div class="order-item">
             <img src="<?php echo $imageSrc; ?>" alt="Product Image">
             <div class="order-details">
@@ -184,11 +181,9 @@ $result = $stmt->get_result();
         </div>
 
     <?php 
-        // Update the total
         $orderTotal += $row['subtotal'];
     } 
 
-    // Close the last order div
     if ($currentOrderId !== null) { 
         echo "</div>"; 
     }
