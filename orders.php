@@ -138,6 +138,10 @@
             <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                 <?php 
                     $full_name = $row['first_name'] . ' ' . $row['last_name'];
+                    
+                    //$country_code = preg_replace('/[^\d+]/', '', $row['phone_country_code']);
+                    //$ph_no = $country_code . ' ' . $row['phone_number'];
+
                     $ph_no = $row['phone_country_code'] . ' ' . $row['phone_number'];
                     $add = $row['address'] . ' ' . $row['extra_address'];
                 ?>

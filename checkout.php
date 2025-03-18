@@ -16,9 +16,40 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $checkout_items = [];
 $total_price = 0;
+// Check if "Buy Again" was clicked
+if (isset($_GET['buy_again']) && $_GET['buy_again'] == 'true' && isset($_GET['order_id'])) {
+    $order_id = (int) $_GET['order_id']; // Ensure order_id is an integer
+
+    // Fetch last order details
+    $query = "SELECT oi.product_id, p.product_name, p.product_image, oi.unit_price, oi.quantity 
+              FROM order_items oi
+              JOIN products p ON oi.product_id = p.product_id 
+              WHERE oi.order_id = ?"; // No need to join orders table
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $checkout_items = []; // Initialize array to store items
+    $total_price = 0; // Initialize total price
+
+    while ($row = $result->fetch_assoc()) {
+        $checkout_items[] = [
+            'product_id' => $row['product_id'],
+            'bn_name' => $row['product_name'],
+            'bn_price' => $row['unit_price'],
+            'bn_image' => $row['product_image'],
+            'bn_quantity' => $row['quantity'],
+            'subtotal' => $row['unit_price'] * $row['quantity']
+        ];
+        $total_price += $row['unit_price'] * $row['quantity'];
+    }
+    $stmt->close();
+}
 
 // Check if "Buy Now" was clicked
-if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
+else if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
     $query = "SELECT * FROM buynow WHERE user_id = ?";
     $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, "i", $user_id);

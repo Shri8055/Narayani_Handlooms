@@ -101,6 +101,14 @@ button{
   padding: 3px;
   font-size: 15px;
   float: right;
+  transition: .3s;
+}
+.p-btn:hover{
+  text-decoration: none;
+  background-color: #efefef;
+  border: 2px solid rgba(0, 0, 0, 0.205);
+  border-radius: 3px;
+  transition: .3s;
 }
 .cont-hr{
   margin-bottom: 20px;

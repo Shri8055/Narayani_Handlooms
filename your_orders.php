@@ -47,7 +47,7 @@ if (isset($_SESSION['user_id'])) {
 $sql = "SELECT 
         o.order_id, o.order_status, t.payment_status, 
         o.created_at, -- Fetch order creation date
-        (SELECT SUM(subtotal) FROM order_items WHERE order_items.order_id = o.order_id) AS total_amount, -- Fix order total calculation
+        (SELECT SUM(subtotal) FROM order_items WHERE order_items.order_id = o.order_id) AS total_amount, 
         oi.quantity, oi.unit_price, oi.subtotal, 
         p.product_name, p.product_image 
     FROM orders o
@@ -174,7 +174,7 @@ $result = $stmt->get_result();
     while ($row = $result->fetch_assoc()) { 
         $imageSrc = htmlspecialchars($row['product_image']);
         $orderDate = date("d M Y, h:i A", strtotime($row['created_at']));
-
+        $order_id=$row['order_id'];
         if ($currentOrderId !== $row['order_id']) { 
             if ($currentOrderId !== null) { 
                 echo "</div>";
@@ -189,7 +189,10 @@ $result = $stmt->get_result();
             </div>
             <div class="inner-order-header">
                 <p><strong>Order Placed:</strong> <?php echo $orderDate; ?></p>
-                <button class="p-btn"><a href="#">🔁 Buy Again</a></button>
+                <form action="buy_again.php" method="POST">
+                    <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($order_id); ?>">
+                    <button class="p-btn" type="submit">🔁 Buy Again</button>
+                </form>
             </div>
             <hr class="order-hr">
     <?php } ?>
@@ -199,7 +202,7 @@ $result = $stmt->get_result();
             <div class="order-details">
                     <p><strong>Product:</strong> <?php echo htmlspecialchars($row['product_name']); ?></p>
                     <p><strong>Quantity:</strong> <?php echo $row['quantity']; ?></p>
-                    <p><strong>Price:</strong> ₹ <?php echo number_format($row['unit_price'], 2); ?></p>
+                    <p><strong>Unit Price:</strong> ₹ <?php echo number_format($row['unit_price'], 2); ?></p>
                     <p><strong>Payment Status:</strong> <?php echo $row['payment_status']; ?></p>
                     <p><strong>Order Status:</strong> <?php echo $row['order_status']; ?></p>
             </div>
