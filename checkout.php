@@ -73,13 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
     $pincode = mysqli_real_escape_string($conn, $_POST['pin_code']);
     $ph_code = mysqli_real_escape_string($conn, $_POST['ph_code']);
     $phone_no = mysqli_real_escape_string($conn, $_POST['ph_no']);
-    $ship_instr = mysqli_real_escape_string($conn, $_POST['ship_instru']);
+    $ship_instr = isset($_POST['ship_instru']) ? mysqli_real_escape_string($conn, $_POST['ship_instru']) : '';
     $total_price = $_SESSION['total_price'] ?? 0;
     $user_F_name = $f_name . " " . $l_name;
-    $user_Fph_no = $ph_code . " " . $phone_no;
+    $user_Fph_no = trim($ph_code . " " . $phone_no);
     $user_Fadd = $address . " " . $e_address;
-    $_SESSION['user_name'] = $user_F_name;
-
+    $_SESSION['username'] = $user_F_name;
+    $_POST['ship_instru'] = "Test Shipping Instruction";
+    print_r($_POST);
+    
     if (empty($f_name) || empty($l_name) || empty($address) || empty($state) || empty($city) || empty($pincode) || empty($phone_no)) {
         echo "<script>alert('Please fill all required fields'); window.location.href='checkout.php';</script>";
     } else {
@@ -90,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = mysqli_prepare($conn, $insert_query);
-        mysqli_stmt_bind_param($stmt, "issssssssssssdss", $user_id, $followup, $country, $f_name, $l_name, $company, $address, $e_address, $state, $city, $pincode, $ph_code, $phone_no, $ship_instr, $total_price, $order_status);
+        mysqli_stmt_bind_param($stmt, "issssssssssssdss", $user_id, $followup, $country, $f_name, $l_name, $company, $address, $e_address, $state, $city, $pincode, $ph_code, $phone_no, ($ship_instr), $total_price, $order_status);
         
         $update_user = "UPDATE users SET user_name='$user_F_name', user_ph_no='$user_Fph_no', user_address='$user_Fadd' WHERE user_id=$user_id";
         mysqli_query($conn, $update_user);
@@ -101,7 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
 
             if ($order_id) {
                 $_SESSION['order_id'] = $order_id;
-            
+                
+                // Logoc to update order because shipping instructuions was appering 0
                 $insert_item = "INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)";
                 $stmt_item = $conn->prepare($insert_item);
             
@@ -116,9 +119,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
                 }
                 $stmt_item->close();
             
-                // Clear cart after order
-                unset($_SESSION['cart']);
-                unset($_SESSION['buy_now']); // Reset Buy Now flag after checkout
+                $sql = "UPDATE orders SET shipping_instructions = '$ship_instr' WHERE order_id='$order_id'";
+                mysqli_query($conn, $sql);
             
                 echo "<script>window.location.href='qr_payment.php?order_id=" . $order_id . "';</script>";
                 exit();

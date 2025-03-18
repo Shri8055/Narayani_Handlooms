@@ -185,8 +185,7 @@ if (isset($_SESSION['user_id'])) {
                 <a href="home.php#about-us"><li>ABOUT US</li></a>
                 <a href="contact_us.php"><li>CONTACT US</li></a>
             </ul>
-            
-        </section><hr>
+        </section>
     <form action="contact_us.php" method="post">
     <div class="form">
         <div class="main-container">

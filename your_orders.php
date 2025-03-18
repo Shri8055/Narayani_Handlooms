@@ -138,10 +138,34 @@ $result = $stmt->get_result();
               </a>
           </div>
         </section><hr>
+        <section class="quick-links">
+            <ul>
+                <a href="home.php"><li>HOME</li></a>
+                <a href="category.php?category=Sale"><li>SALE / OFFERS</li></a>
+                <a href="category.php?category=Best Seller"><li>BEST SELLER</li></a>
+                <li id="category-toggle">SHOP BY CATEGORY ▼
+                    <ul class="dropdown">
+                      <a href="category.php?category=Bags"><li>BAGS</li></a><hr>
+                      <a href="category.php?category=Men"><li>MEN</li></a><hr>
+                      <a href="category.php?category=Women"><li>WOMEN</li></a><hr>
+                      <a href="category.php?category=MenandWomen"><li>MEN & WOMEN</li></a><hr>
+                      <a href="category.php?category=Accessories"><li>ACCESSORIES</li></a><hr>
+                      <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a><hr>
+                      <a href="category.php?category=Decor"><li>DECOR ITEMS</li></a><hr>
+                      <a href="category.php?category=Gift hampers"><li>GIFT HAMPERS</li></a>
+                    </ul>
+                </li>
+                <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
+                <a href="#"><li>CUSTOMISED ORDER</li></a>
+                <a href="your_orders.php"><li>YOUR ORDERS</li></a>
+                <a href="home.php#about-us"><li>ABOUT US</li></a>
+                <a href="contact_us.php"><li>CONTACT US</li></a>
+            </ul>
+        </section>
 <a class="btn" href="home.php"><button>BACK 🔙</button></a>
 
 <div class="container order-container">
-    <h2 class="text-center mb-4">Your Orders</h2>
+    <h2 class="text-center mb-4">Your Orders</h2><hr class="cont-hr">
     
     <?php 
     $currentOrderId = null; 
@@ -162,9 +186,11 @@ $result = $stmt->get_result();
             <div class="order-header">
                 <h4>Order ID: <?php echo $row['order_id']; ?></h4>
                 <p class="order-total"><strong>Total Order Amount:</strong> ₹ <?php echo number_format($row['total_amount'], 2); ?></p>
-
             </div>
-            <p><strong>Order Placed:</strong> <?php echo $orderDate; ?></p>
+            <div class="inner-order-header">
+                <p><strong>Order Placed:</strong> <?php echo $orderDate; ?></p>
+                <button class="p-btn"><a href="#">🔁 Buy Again</a></button>
+            </div>
             <hr class="order-hr">
     <?php } ?>
 
@@ -176,7 +202,6 @@ $result = $stmt->get_result();
                     <p><strong>Price:</strong> ₹ <?php echo number_format($row['unit_price'], 2); ?></p>
                     <p><strong>Payment Status:</strong> <?php echo $row['payment_status']; ?></p>
                     <p><strong>Order Status:</strong> <?php echo $row['order_status']; ?></p>
-                
             </div>
         </div>
 
@@ -209,6 +234,14 @@ function openTab(evt, tabName) {
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " active";
 }
+// dropdown
+document.addEventListener("DOMContentLoaded", function () {
+  const categoryToggle = document.getElementById("category-toggle");
+
+  categoryToggle.addEventListener("click", function () {
+      this.classList.toggle("active");
+  });
+});
 </script>
 <script src="index.js" defer></script>
 </body>
