@@ -166,6 +166,7 @@ $result = $stmt->get_result();
 
 <div class="container order-container">
     <h2 class="text-center mb-4">Your Orders</h2><hr class="cont-hr">
+    <p class="note"><i>Note : Orders with no Transaction details will be deleted by Admin.</i></p>
     
     <?php 
     $currentOrderId = null; 

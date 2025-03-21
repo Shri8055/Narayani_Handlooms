@@ -55,7 +55,6 @@
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
         }
-    
         // Update the order status AFTER updating product count
         $update_order_query = "UPDATE orders SET order_status = ? WHERE order_id = ?";
         $stmt = mysqli_prepare($conn, $update_order_query);

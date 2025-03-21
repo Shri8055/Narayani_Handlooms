@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
@@ -10,7 +9,6 @@ if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     $cart_count_query = "SELECT SUM(quantity) AS total FROM cart WHERE user_id = $user_id";
     $cart_count_result = mysqli_query($conn, $cart_count_query);
-
     if ($cart_count_result) {
         $cart_count_row = mysqli_fetch_assoc($cart_count_result);
         $cart_count = $cart_count_row['total'] ?? 0;
@@ -23,11 +21,9 @@ if (isset($_SESSION['user_id'])) {
 }
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-  
     // Check if user_id already exists
     $check_query = "SELECT * FROM buynow WHERE user_id = $user_id";
     $result = mysqli_query($conn, $check_query);
-  
     if (mysqli_num_rows($result) == 0) {
         // Insert user_id only (no product data yet)
         $insert_query = "INSERT INTO buynow (user_id) VALUES ('$user_id')";
@@ -39,7 +35,6 @@ if (!isset($_GET['category']) || empty($_GET['category'])) {
     echo "<h2>Invalid category</h2>";
     exit;
 }
-
 $category = trim(mysqli_real_escape_string($conn, urldecode($_GET['category'])));
 if ($category === 'Bags') {
     $query = "SELECT * FROM products WHERE genre IN ('Men Bags', 'Women Bags', 'Men & Women Bags') ORDER BY RAND()";
@@ -63,10 +58,7 @@ if ($category === 'Bags') {
     $query = "SELECT * FROM products WHERE genre = '$category' ORDER BY RAND()";
 }
 $result = mysqli_query($conn, $query);
-
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

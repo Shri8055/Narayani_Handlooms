@@ -1,8 +1,45 @@
 <?php
 session_start();
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
+
+require 'vendor/autoload.php';
+
 $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
+}
+
+function sendMail($to, $subject, $msg) {
+    $mail = new PHPMailer();
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'shrinivaskangralkar8055@gmail.com';
+        $mail->Password = 'vedt izue arff tcpp';
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = 587;
+        $mail->setFrom('shrinivaskangralkar8055@gmail.com', 'Narayani Handlooms');
+        $mail->addAddress($to);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $msg;
+        $mail->SMTPOptions = array('ssl'=>array(
+            'verify_peer'=>false,
+            'verify_peer_name'=>false,
+            'allow_self_signed'=>false
+        ));
+        
+        if (!$mail->Send()) {
+            return $mail->ErrorInfo;  // Return the error message
+        } else {
+            return true;  // Return boolean true on success
+        }
+    } catch (Exception $e) {
+        return "Mailer Error: " . $mail->ErrorInfo;
+    }
 }
 
 // Handle payment status update before closing the connection
@@ -11,14 +48,87 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['order_id'], $_POST['pa
     $payment_status = $_POST['payment_status'];
 
     $update_query = "UPDATE transactions SET payment_status='$payment_status' WHERE order_id='$order_id'";
+    
     if (mysqli_query($conn, $update_query)) {
-        header("Location: admin_transactions.php"); // Maintain filter
+        if ($payment_status == 'Completed') {
+
+            // Fetch required details for email
+            $query = "SELECT 
+                        u.user_name, 
+                        u.user_email AS user_email,
+                        oi.order_id, 
+                        (oi.quantity * oi.unit_price) AS sub_amount, 
+                        t.transaction_id, 
+                        t.transaction_date, 
+                        t.transaction_time
+                    FROM transactions t
+                    JOIN orders o ON t.order_id = o.order_id
+                    JOIN users u ON o.user_id = u.user_id
+                    JOIN order_items oi ON o.order_id = oi.order_id
+                    WHERE t.order_id = '$order_id'";
+
+            $result = mysqli_query($conn, $query);
+            if ($row = mysqli_fetch_assoc($result)) {
+                $user_name = $row['user_name'];
+                $user_email = $row['user_email'];
+                $order_id = $row['order_id'];
+                $sub_amount = $row['sub_amount'];
+                $transaction_id = $row['transaction_id'];
+                $transaction_date = $row['transaction_date'];
+                $transaction_time = $row['transaction_time'];
+
+                $email_body = "<h2>Your Payment Has Been Confirmed, $user_name!</h2>
+                   <p>We are pleased to inform you that your payment has been successfully verified by our team.</p>
+                   <p>Your order is now being processed and will be dispatched soon.</p>
+                   <p><strong>Order ID:</strong> $order_id</p>
+                   <p><strong>Transaction ID:</strong> $transaction_id</p>
+                   <p><strong>Amount Paid:</strong> ₹$sub_amount</p>
+                   <p><strong>Transaction Date:</strong> $transaction_date</p>
+                   <p><strong>Transaction Time:</strong> $transaction_time</p>
+                   <p><strong>Payment Status:</strong> <span style='color: green; font-weight: bold;'>Confirmed ✅</span></p>
+                   <p>We appreciate your trust in us! Your order will be shipped soon, and you will receive another email with tracking details.</p>
+                   <p>If you have any questions, feel free to <a href='http://localhost/NarayaniHandlooms/contact_us.php'>Contact Us</a>.</p><br>
+                   <p>To check your updated order status, <a href='http://localhost/NarayaniHandlooms/your_orders.php'>Click Here</a>.</p>";
+
+                $mail_sent = sendMail($user_email, 'Payment Confirmation', $email_body);
+
+                if ($mail_sent === true) {
+                    echo "<script>
+                        alert('Payment confirmed! Mail sent to $user_name.');
+                        setTimeout(function() {
+                            window.location.href = 'admin_transactions.php';
+                        }, 100);
+                    </script>";
+                } else {
+                    echo "Email Error: " . $mail_sent;
+                }
+                exit();
+            }
+        } else {
+            echo "<script>
+                window.location.href='admin_transactions.php';
+            </script>";
+        }
         exit();
     }
 }
 
 // Fetch transactions
-$query = "SELECT transaction_id, order_id, user_id, user_name, amount, transaction_date, transaction_time, payment_status FROM transactions ORDER BY transaction_date DESC";
+$query = "SELECT 
+            t.transaction_id, 
+            t.order_id, 
+            o.user_id, 
+            u.user_name, 
+            (oi.quantity * oi.unit_price) AS amount, 
+            t.transaction_date, 
+            t.transaction_time, 
+            t.payment_status
+        FROM transactions t
+        JOIN orders o ON t.order_id = o.order_id
+        JOIN users u ON o.user_id = u.user_id
+        JOIN order_items oi ON o.order_id = oi.order_id
+        ORDER BY t.transaction_date DESC";
+
 $result = mysqli_query($conn, $query);
 
 // Fetch transaction count
@@ -27,9 +137,9 @@ $count_result = mysqli_query($conn, $count_query);
 $count_row = mysqli_fetch_assoc($count_result);
 $_SESSION['transaction_count'] = $count_row['total'];
 
-// **Now close the connection at the end**
 mysqli_close($conn);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

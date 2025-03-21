@@ -81,7 +81,7 @@ unset($_SESSION['buy_now']);
             <td><?= htmlspecialchars($product['name']) ?></td>
             <td>₹<?= number_format($product['price'], 2) ?></td>
             <td>
-                <button class="btn btn-decrease" onclick="updateQuantity(<?= $id ?>, 'decrease')">−</button>
+                <button class="btn btn-decrease" onclick="updateQuantity(<?= $id ?>, 'decrease')">-</button>
                 <?= $product['quantity'] ?>
                 <button class="btn btn-increase" onclick="updateQuantity(<?= $id ?>, 'increase')">+</button>
             </td>

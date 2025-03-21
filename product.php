@@ -1,10 +1,12 @@
 <?php
+// Session start to import/export session variables over multiple pages
 session_start();
-
+// check for sql connection
 $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
+// check for valid id
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     echo "<h2>Invalid request</h2>";
     exit;
@@ -12,6 +14,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 if (isset($_GET['id'])) {
   $_SESSION['sel_product_id'] = (int)$_GET['id'];
 }
+// check for product is present in table and display using $row
 $product_id = (int) $_GET['id'];
 $query = "SELECT * FROM products WHERE product_id = $product_id";
 $result = mysqli_query($conn, $query);
@@ -20,11 +23,13 @@ if (!$result || mysqli_num_rows($result) == 0) {
     exit;
 }
 $row = mysqli_fetch_assoc($result);
+// load image data
 $image_query = "SELECT image_data FROM product_images WHERE product_id = $product_id";
 $image_result = mysqli_query($conn, $image_query);
 $images = [];
 while ($img_row = mysqli_fetch_assoc($image_result)) {
-    $images[] = base64_encode($img_row['image_data']);
+  // images are stored in BLOB binary form to display back to JPEG we encode that image   
+  $images[] = base64_encode($img_row['image_data']);
 }
 $image_query = "SELECT image_data FROM product_images WHERE product_id = $product_id LIMIT 1";
 $image_result = mysqli_query($conn, $image_query);
@@ -32,18 +37,18 @@ $product_image = "";
 if ($image_row = mysqli_fetch_assoc($image_result)) {
     $product_image = "data:image/jpeg;base64," . base64_encode($image_row['image_data']);
 }
+// check if user is login or not to show cart count
 $cart_count = 0;
 if (isset($_SESSION['user_id'])) {
-    $cart_count_query = "SELECT SUM(quantity) as total FROM cart WHERE user_id = '" . $_SESSION['user_id'] . "'";
-    $cart_count_result = mysqli_query($conn, $cart_count_query);
-
-    if ($cart_count_result) {
-        $cart_count_row = mysqli_fetch_assoc($cart_count_result);
-        $cart_count = $cart_count_row['total'] ?? 0;
+    $cart_count_query="SELECT SUM(quantity) as total FROM cart WHERE user_id = '" . $_SESSION['user_id'] . "'";
+    $cart_count_result=mysqli_query($conn, $cart_count_query);
+    if($cart_count_result){
+        $cart_count_row=mysqli_fetch_assoc($cart_count_result);
+        $cart_count=$cart_count_row['total'] ?? 0;
     }
 }
 // buy now
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
+if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])){
   session_start();
   $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
   if (!$conn) {
@@ -56,7 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
             </script>";
       exit;
   }
-
   $user_id = $_SESSION['user_id'];
   $product_id = (int)$_POST['buy_now_product_id'];
   $product_name = mysqli_real_escape_string($conn, $_POST['buy_now_product_name']);
@@ -68,7 +72,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
       echo "<script>alert('Invalid product details.');</script>";
       exit;
   }
-
   $check_query = "SELECT * FROM buynow WHERE user_id = ?";
   $stmt = mysqli_prepare($conn, $check_query);
   mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -77,20 +80,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['buy_now'])) {
   $existing_item = mysqli_fetch_assoc($result);
   mysqli_stmt_close($stmt);
   $_SESSION['buy_now'] = 'clicked';
-  if ($existing_item) {
-
+  // updating table of buy now to show item at checkuot
+  if($existing_item){
       $update_query = "UPDATE buynow SET product_id = ?, product_name = ?, product_price = ?, product_image = ?, quantity = ?
                        WHERE user_id = ?";
       $stmt = mysqli_prepare($conn, $update_query);
       mysqli_stmt_bind_param($stmt, "isdsii", $product_id, $product_name, $product_price, $product_image, $quantity, $user_id);
-  } else {
-      
+  }else{
       $insert_query = "INSERT INTO buynow (user_id, product_id, product_name, product_price, product_image, quantity)
                        VALUES (?, ?, ?, ?, ?, ?)";
       $stmt = mysqli_prepare($conn, $insert_query);
       mysqli_stmt_bind_param($stmt, "iisdsd", $user_id, $product_id, $product_name, $product_price, $product_image, $quantity);
   }
-
   mysqli_stmt_execute($stmt);
   mysqli_stmt_close($stmt);
   mysqli_close($conn);
@@ -113,19 +114,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
     $product_price = (float) $_POST['product_price'];
     $product_image = mysqli_real_escape_string($conn, $_POST['product_image']);
     $quantity = isset($_POST['quantity']) ? (int) $_POST['quantity'] : 1;
-
     if ($product_id <= 0 || empty($product_name) || $product_price <= 0 || empty($product_image)) {
         echo "<script>alert('Invalid product details.');</script>";
         exit;
     }
-
     if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
     }
-
     if (isset($_SESSION['cart'][$product_id])) {
         $_SESSION['cart'][$product_id]['quantity'] += $quantity;
-    } else {
+    }else{
         $_SESSION['cart'][$product_id] = [
             'name' => $product_name,
             'price' => $product_price,
@@ -133,25 +131,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
             'quantity' => $quantity
         ];
     }
+    // updating table of buy now to show item at checkuot
     $cart_check_query = "SELECT * FROM cart WHERE user_id = $user_id AND product_id = $product_id";
     $cart_check_result = mysqli_query($conn, $cart_check_query);
-
+    // update cart quantity to update cart count
     if (mysqli_num_rows($cart_check_result) > 0) {
         $update_query = "UPDATE cart SET quantity = quantity + $quantity WHERE user_id = $user_id AND product_id = $product_id";
         mysqli_query($conn, $update_query);
-    } else {
+    }else{
         $insert_query = "INSERT INTO cart (user_id, product_id, product_name, product_price, product_image, quantity) 
                          VALUES ($user_id, $product_id, '$product_name', $product_price, '$product_image', $quantity)";
         mysqli_query($conn, $insert_query);
     }
-
     header("Location: product.php?id=$product_id&cart_success=1");
     exit();
 }
 ?>
-
 <?php if (isset($_GET['cart_success']) && $_GET['cart_success'] == 1): ?>
 <script>
+    // redirect to same product id
     alert("Item added to cart successfully!");
     window.location.href = "product.php?id=<?php echo $product_id; ?>";
 </script>
@@ -257,7 +255,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_to_cart'])) {
             <script>
               document.addEventListener("DOMContentLoaded", function () {
                 const categoryToggle = document.getElementById("category-toggle");
-
                 categoryToggle.addEventListener("click", function () {
                     this.classList.toggle("active");
                 });

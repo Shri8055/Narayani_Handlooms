@@ -1,32 +1,33 @@
 <?php
+// Session start to import/export session variables over multiple pages
 session_start();
+// Check for sql connection
 $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+  die("Connection failed: " . mysqli_connect_error());
 }
-
 $cart_count = 0;
-
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-    $cart_count_query = "SELECT SUM(quantity) AS total FROM cart WHERE user_id = $user_id";
-    $cart_count_result = mysqli_query($conn, $cart_count_query);
-
-    if ($cart_count_result) {
-        $cart_count_row = mysqli_fetch_assoc($cart_count_result);
-        $cart_count = $cart_count_row['total'] ?? 0;
-    }
-} elseif (isset($_SESSION['cart'])) {
+// if user is login then will show his cart count
+if (isset($_SESSION['user_id'])){
+  $user_id=$_SESSION['user_id'];
+  $cart_count_query="SELECT SUM(quantity) AS total FROM cart WHERE user_id = $user_id";
+  $cart_count_result=mysqli_query($conn, $cart_count_query);
+  if($cart_count_result){
+    $cart_count_row=mysqli_fetch_assoc($cart_count_result);
+    $cart_count=$cart_count_row['total'] ?? 0;
+  }
+}elseif(isset($_SESSION['cart'])){
     // Count the total items in session cart for guest users
-    foreach ($_SESSION['cart'] as $item) {
-        $cart_count += $item['quantity'];
+    foreach($_SESSION['cart'] as $item){
+      $cart_count += $item['quantity'];
     }
 }
+// update user whatsapp number to table
 if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['wa_sub'])){
   $user_id=$_SESSION['user_id'];
   $whatsAppNo=mysqli_real_escape_string($conn, $_POST['wa_ph_no']);
   $update_query = "UPDATE users SET user_ph_no='$whatsAppNo' WHERE user_id='$user_id'";
-  if(mysqli_query($conn, $update_query)) {
+  if(mysqli_query($conn, $update_query)){
     echo "<script>
             alert('WhatsApp Number Sent!\\nWill notify about new products and offers');
             window.location.href = 'home.php';
@@ -36,17 +37,15 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['wa_sub'])){
     echo "Error updating record: " . mysqli_error($conn);
   }
 }
-if (isset($_SESSION['user_id'])) {
+if(isset($_SESSION['user_id'])){
   $user_id = $_SESSION['user_id'];
-
   // Check if user_id already exists
   $check_query = "SELECT * FROM buynow WHERE user_id = $user_id";
   $result = mysqli_query($conn, $check_query);
-
   if (mysqli_num_rows($result) == 0) {
-      // Insert user_id only (no product data yet)
-      $insert_query = "INSERT INTO buynow (user_id) VALUES ('$user_id')";
-      mysqli_query($conn, $insert_query);
+    // Insert user_id only (no product data yet)
+    $insert_query = "INSERT INTO buynow (user_id) VALUES ('$user_id')";
+    mysqli_query($conn, $insert_query);
   }
 }
 ?>
@@ -66,12 +65,12 @@ if (isset($_SESSION['user_id'])) {
     </head>
     <body>
         <header>
-        <?php if (isset($_SESSION['username'])): ?>
+        <?php if(isset($_SESSION['username'])): ?>
           <h2 class="banner">
-              Hello, <?php echo $_SESSION['username']; ?>
+            Hello, <?php echo $_SESSION['username'];?>
           </h2>
           <?php else: ?>
-              <h2 class="banner"></h2>
+            <h2 class="banner"></h2>
           <?php endif; ?>
             <h3>WELCOME TO NARAYANI HANDLOOMS 🙏</h3>
         </header>
@@ -81,28 +80,28 @@ if (isset($_SESSION['user_id'])) {
                 <div class="inner-popup-content">
                   <span class="close">&times;</span>
                   <div class="tabs">
-                      <button class="tablinks active" onclick="openTab(event, 'Login')">Login</button>
-                      <button class="tablinks" onclick="openTab(event, 'Signup')">Signup</button>
+                    <button class="tablinks active" onclick="openTab(event, 'Login')">Login</button>
+                    <button class="tablinks" onclick="openTab(event, 'Signup')">Signup</button>
                   </div>
                   <div id="Login" class="tabcontent active">
                       <form action="home.php" method="POST">
-                          <label for="user"><i class="fa-solid fa-envelope"></i></label>
-                          <input type="email" id="user" name="email" placeholder="Email" required>
-                          <label for="pass"><i class="fa-solid fa-key"></i></label>
-                          <input type="password" id="pass" name="password" placeholder="Password" required>
-                          <a href="#" class="forgot-pass"><p>Forgot password ?</p></a>
-                          <button type="submit" name="login" class="login-btn">Login</button>
+                        <label for="user"><i class="fa-solid fa-envelope"></i></label>
+                        <input type="email" id="user" name="email" placeholder="Email" required>
+                        <label for="pass"><i class="fa-solid fa-key"></i></label>
+                        <input type="password" id="pass" name="password" placeholder="Password" required>
+                        <a href="#" class="forgot-pass"><p>Forgot password ?</p></a>
+                        <button type="submit" name="login" class="login-btn">Login</button>
                       </form>
                   </div>
                   <div id="Signup" class="tabcontent">
                       <form action="home.php" method="POST">
-                          <label for="fname"><i class="fa-solid fa-user"></i></label>
-                          <input type="text" id="fname" name="name" placeholder="Full Name" required>
-                          <label for="email"><i class="fa-solid fa-envelope"></i></label>
-                          <input type="email" id="email" name="email" placeholder="Email" required>
-                          <label for="pass"><i class="fa-solid fa-key"></i></label>
-                          <input type="password" id="pass" name="password" placeholder="Password" required>
-                          <button type="submit" name="signup" class="sign-btn">Signup</button>
+                        <label for="fname"><i class="fa-solid fa-user"></i></label>
+                        <input type="text" id="fname" name="name" placeholder="Full Name" required>
+                        <label for="email"><i class="fa-solid fa-envelope"></i></label>
+                        <input type="email" id="email" name="email" placeholder="Email" required>
+                        <label for="pass"><i class="fa-solid fa-key"></i></label>
+                        <input type="password" id="pass" name="password" placeholder="Password" required>
+                        <button type="submit" name="signup" class="sign-btn">Signup</button>
                       </form>
                   </div>
                 </div>
@@ -111,10 +110,10 @@ if (isset($_SESSION['user_id'])) {
         <section class="sec1-container">
           <div class="left-inner-sec1-container">
               <a href="#" id="user-icon">
-                  <i class="fa-solid fa-user" data-tooltip="Log-in / Sign-Up"></i>
+                <i class="fa-solid fa-user" data-tooltip="Log-in / Sign-Up"></i>
               </a>
               <a href="logout.php" id="user-logout">
-                  <i class="fa-solid fa-arrow-right-from-bracket" data-tooltip="Logout"></i>
+                <i class="fa-solid fa-arrow-right-from-bracket" data-tooltip="Logout"></i>
               </a>
           </div>
           <img src="images/Narayani.png" alt="logo" class="logo-img">
@@ -127,73 +126,75 @@ if (isset($_SESSION['user_id'])) {
           </div>
         </section><hr>
         <section class="quick-links">
-            <ul>
-                <a href="home.php"><li>HOME</li></a>
-                <a href="category.php?category=Sale"><li>SALE / OFFERS</li></a>
-                <a href="category.php?category=Best Seller"><li>BEST SELLER</li></a>
-                <li id="category-toggle">SHOP BY CATEGORY ▼
-                    <ul class="dropdown">
-                      <a href="category.php?category=Bags"><li>BAGS</li></a><hr>
-                      <a href="category.php?category=Men"><li>MEN</li></a><hr>
-                      <a href="category.php?category=Women"><li>WOMEN</li></a><hr>
-                      <a href="category.php?category=MenandWomen"><li>MEN & WOMEN</li></a><hr>
-                      <a href="category.php?category=Accessories"><li>ACCESSORIES</li></a><hr>
-                      <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a><hr>
-                      <a href="category.php?category=Decor"><li>DECOR ITEMS</li></a><hr>
-                      <a href="category.php?category=Gift hampers"><li>GIFT HAMPERS</li></a>
-                    </ul>
-                </li>
-                <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
-                <a href="#"><li>CUSTOMISED ORDER</li></a>
-                <a href="your_orders.php"><li>YOUR ORDERS</li></a>
-                <a href="#about-us"><li>ABOUT US</li></a>
-                <a href="contact_us.php"><li>CONTACT US</li></a>
-            </ul>
+          <ul>
+            <a href="home.php"><li>HOME</li></a>
+            <a href="category.php?category=Sale"><li>SALE / OFFERS</li></a>
+            <a href="category.php?category=Best Seller"><li>BEST SELLER</li></a>
+            <li id="category-toggle">SHOP BY CATEGORY ▼
+              <ul class="dropdown">
+                <a href="category.php?category=Bags"><li>BAGS</li></a><hr>
+                <a href="category.php?category=Men"><li>MEN</li></a><hr>
+                <a href="category.php?category=Women"><li>WOMEN</li></a><hr>
+                <a href="category.php?category=MenandWomen"><li>MEN & WOMEN</li></a><hr>
+                <a href="category.php?category=Accessories"><li>ACCESSORIES</li></a><hr>
+                <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a><hr>
+                <a href="category.php?category=Decor"><li>DECOR ITEMS</li></a><hr>
+                <a href="category.php?category=Gift hampers"><li>GIFT HAMPERS</li></a>
+              </ul>
+            </li>
+            <a href="category.php?category=Jewellery"><li>JEWELLERY</li></a>
+            <a href="#"><li>CUSTOMISED ORDER</li></a>
+            <a href="your_orders.php"><li>YOUR ORDERS</li></a>
+            <a href="#about-us"><li>ABOUT US</li></a>
+            <a href="contact_us.php"><li>CONTACT US</li></a>
+          </ul>
         </section>
         <section class="slide-show">
-            <div class="slideshow-container">
-                <div class="mySlides fade">
-                  <div class="numbertext">1 / 3</div>
-                  <img src="images/5.jpg">
+          <div class="slideshow-container">
+            <div class="mySlides fade">
+              <div class="numbertext">1 / 3</div>
+                <img src="images/5.jpg">
                   <div class="text">
                     <p class="slide-header">BEST SELLER</p>
                     <p class="slide-des">EXPLORE OUR BEST SELLER !</p>
                     <button>SHOP NOW</button>
                   </div>
-                </div>
-                <div class="mySlides fade">
-                  <div class="numbertext">2 / 3</div>
+              </div>
+              <div class="mySlides fade">
+                <div class="numbertext">2 / 3</div>
                   <img src="images/6.jpeg" style="width:100%">
                   <div class="text">
                     <p class="slide-header">NEW ARRIVAL</p>
                     <p class="slide-des">NEW LAUNCHES BAG NAME !</p>
                     <button>SHOP NOW</button>
-                  </div>
                 </div>
-                <div class="mySlides fade">
-                  <div class="numbertext">3 / 3</div>
+              </div>
+              <div class="mySlides fade">
+                <div class="numbertext">3 / 3</div>
                   <img src="images/4.jpg" style="width:100%">
                   <div class="text">
                     <p class="slide-header">CUSTOMIZE ORDERS</p>
                     <p class="slide-des">Customize orders in various ways !</p>
                     <button>EXPLORE NOW</button>
-                  </div>
                 </div>
-                <a class="prev" onclick="plusSlides(-1)">❮</a>
-                <a class="next" onclick="plusSlides(1)">❯</a>
-                </div><br>
-                <div style="text-align:center">
-                  <span class="dot" onclick="currentSlide(1)"></span> 
-                  <span class="dot" onclick="currentSlide(2)"></span> 
-                  <span class="dot" onclick="currentSlide(3)"></span> 
-                </div>
+              </div>
+              <a class="prev" onclick="plusSlides(-1)">❮</a>
+              <a class="next" onclick="plusSlides(1)">❯</a>
+              </div><br>
+              <div style="text-align:center">
+                <span class="dot" onclick="currentSlide(1)"></span> 
+                <span class="dot" onclick="currentSlide(2)"></span> 
+                <span class="dot" onclick="currentSlide(3)"></span> 
+              </div>
+            </div>
+          </div>
         </section><hr class="slide-hr">
         <h4 class="collection-h4">FEATURED COLLECTION</h4>
         <section class="collection">
         <?php
-          $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
-          $result = mysqli_query($conn, "SELECT * FROM products WHERE product_type='Featured' LIMIT 8");
-          while ($row = mysqli_fetch_assoc($result)){
+          $conn=mysqli_connect('localhost', 'root', '', 'narayani', 4306);
+          $result=mysqli_query($conn, "SELECT * FROM products WHERE product_type='Featured' LIMIT 8");
+          while($row=mysqli_fetch_assoc($result)){
               echo "<a href='product.php?id=" . $row['product_id'] . "' target='_blank' class='card-link'>";
               echo "<div class='card'>";
               echo "<img src='" . $row['product_image'] . "' alt='" . $row['product_name'] . "'>";
@@ -348,6 +349,7 @@ if (isset($_SESSION['user_id'])) {
             if($stmt->execute()){
                 $_SESSION['user_id'] = $stmt->insert_id;
                 $_SESSION['username']=$user_name;
+                $_SESSION['user_email']=$user_email;
                 echo "<script>alert('User registered successfully!'); window.location.href='home.php';</script>";
                 header("Location: home.php?success=1");
                 exit();
@@ -371,6 +373,7 @@ if (isset($_SESSION['user_id'])) {
           if(password_verify($user_pass, $hashed_password)){
             $_SESSION['user_id']=$user_id;
             $_SESSION['username']=$user_name;
+            $_SESSION['user_email']=$user_email;
             if($user_email==="Narayani2025@gmail.com"){
               $_SESSION['admin']=$user_email;
               echo "<script>alert('Admin Login Successful'); window.open('admin_dash.php', '_blank');</script>";

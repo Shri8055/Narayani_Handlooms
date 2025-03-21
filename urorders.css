@@ -113,7 +113,12 @@ button{
 .cont-hr{
   margin-bottom: 20px;
 }
-
+.note{
+  color: crimson;
+  text-align: center;
+  font-size: 14px;
+  margin: -10px 0 10px 0;
+}
 header{
   background-color: black;
   text-align: center;

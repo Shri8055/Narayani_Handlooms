@@ -1,13 +1,10 @@
 <?php
-  session_start();
-?>
-<?php
+session_start();
 $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (isset($_GET['id'])) {
     $product_id = $_GET['id'];
     $query = "SELECT * FROM products WHERE product_id = $product_id";
     $result = mysqli_query($conn, $query);
-
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
     } else {
@@ -23,12 +20,9 @@ if (isset($_POST['deleteProduct'])) {
         echo "<h2>Invalid Product ID</h2>";
         exit();
     }
-
     $delete_query = "DELETE FROM products WHERE product_id = '$product_id'";
     $delete_images_query = "DELETE FROM product_images WHERE product_id = '$product_id'";
-
     mysqli_query($conn, $delete_images_query);
-
     if (mysqli_query($conn, $delete_query)) {
         echo "<script>alert('Product deleted successfully!'); window.location.href = 'admin_dash.php';</script>";
         exit();
@@ -40,7 +34,6 @@ if (isset($_GET['id'])) {
     $product_id = $_GET['id'];
     $query = "SELECT * FROM products WHERE product_id = $product_id";
     $result = mysqli_query($conn, $query);
-
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
     } else {

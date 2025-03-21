@@ -40,14 +40,12 @@ if (isset($_GET['buy_again']) && $_GET['buy_again'] == 'true' && isset($_GET['or
             'bn_name' => $row['product_name'],
             'bn_price' => $row['unit_price'],
             'bn_image' => $row['product_image'],
-            'bn_quantity' => $row['quantity'],
-            'subtotal' => $row['unit_price'] * $row['quantity']
+            'bn_quantity' => $row['quantity']
         ];
         $total_price += $row['unit_price'] * $row['quantity'];
     }
     $stmt->close();
 }
-
 // Check if "Buy Now" was clicked
 else if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
     $query = "SELECT * FROM buynow WHERE user_id = ?";
@@ -144,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['payNow'])) {
                     $quantity = $item['bn_quantity'];
                     $unit_price = $item['bn_price'];
                     $subtotal = $quantity * $unit_price;
-            
+                    $_SESSION['total_price'] = $subtotal;
                     $stmt_item->bind_param("iiidd", $order_id, $product_id, $quantity, $unit_price, $subtotal);
                     $stmt_item->execute();
                 }

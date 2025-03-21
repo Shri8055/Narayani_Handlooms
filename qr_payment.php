@@ -3,22 +3,16 @@ session_start();
 include 'cart_session.php';
 $cart_total = $_SESSION['total_price'];
 $cart_items = $_SESSION['cart_items'] ?? [];
-
 $cart_note = "Order: " . count($cart_items) . " items\n";
 foreach ($cart_items as $item) {
     $cart_note .= $item['name'] . " (Qty: " . $item['quantity'] . "), ";
 }
 $cart_note = rtrim($cart_note, ", ");
-
 $upi_id = "shrinivaskangralkar8055@oksbi";
 $shop_name = "Narayani Handlooms";
-
 $upi_link = "upi://pay?pa=$upi_id&pn=$shop_name&am=$cart_total&tn=$cart_note&cu=INR";
-
 $qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" . urlencode($upi_link);
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
