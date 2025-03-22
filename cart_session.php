@@ -21,7 +21,6 @@ if (isset($_GET['buy_again']) || $_SESSION['buy_again'] == 'true' && isset($_GET
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    echo "Buy Again block in cart session";
     while ($row = $result->fetch_assoc()) {
         $cart_items[] = [
             'name' => $row['product_name'],
@@ -35,7 +34,6 @@ else if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
     $user_id = $_SESSION['user_id'];
     $buynow_query = "SELECT * FROM buynow WHERE user_id = $user_id LIMIT 1";
     $buynow_result = mysqli_query($conn, $buynow_query);
-    echo "Buy now block in cart session";
     if ($buynow_row = mysqli_fetch_assoc($buynow_result)) {
         $cart_items[] = [
             'name' => $buynow_row['product_name'],
@@ -47,7 +45,6 @@ else if (isset($_SESSION['buy_now']) && !empty($_SESSION['buy_now'])) {
     $user_id = $_SESSION['user_id'];
     $cart_query = "SELECT * FROM cart WHERE user_id = $user_id";
     $cart_result = mysqli_query($conn, $cart_query);
-    echo "Cart block in cart session";
     while ($cart_row = mysqli_fetch_assoc($cart_result)) {
         $cart_items[] = [
             'name' => $cart_row['product_name'],
