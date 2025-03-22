@@ -50,64 +50,85 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['order_id'], $_POST['pa
     $update_query = "UPDATE transactions SET payment_status='$payment_status' WHERE order_id='$order_id'";
     
     if (mysqli_query($conn, $update_query)) {
-        if ($payment_status == 'Completed') {
-
+        if ($payment_status == 'Completed' || $payment_status == 'Failed') {
             // Fetch required details for email
             $query = "SELECT 
-                        u.user_name, 
-                        u.user_email AS user_email,
-                        oi.order_id, 
-                        (oi.quantity * oi.unit_price) AS sub_amount, 
-                        t.transaction_id, 
-                        t.transaction_date, 
-                        t.transaction_time
-                    FROM transactions t
-                    JOIN orders o ON t.order_id = o.order_id
-                    JOIN users u ON o.user_id = u.user_id
-                    JOIN order_items oi ON o.order_id = oi.order_id
-                    WHERE t.order_id = '$order_id'";
+            u.user_name, 
+            u.user_email AS user_email,
+            oi.order_id, 
+            SUM(oi.quantity * oi.unit_price) AS total_amount, 
+            t.transaction_id, 
+            t.transaction_date, 
+            t.transaction_time
+          FROM transactions t
+          JOIN orders o ON t.order_id = o.order_id
+          JOIN users u ON o.user_id = u.user_id
+          JOIN order_items oi ON o.order_id = oi.order_id
+          WHERE t.order_id = '$order_id'
+          GROUP BY oi.order_id, t.transaction_id, t.transaction_date, t.transaction_time, u.user_name, u.user_email ORDER BY t.transaction_id DESC, t.transaction_time DESC";
 
-            $result = mysqli_query($conn, $query);
-            if ($row = mysqli_fetch_assoc($result)) {
-                $user_name = $row['user_name'];
-                $user_email = $row['user_email'];
-                $order_id = $row['order_id'];
-                $sub_amount = $row['sub_amount'];
-                $transaction_id = $row['transaction_id'];
-                $transaction_date = $row['transaction_date'];
-                $transaction_time = $row['transaction_time'];
+$result = mysqli_query($conn, $query);
+if ($row = mysqli_fetch_assoc($result)) {
+    // Assign fetched values to variables
+    $user_name = $row['user_name'];
+    $user_email = $row['user_email'];
+    $order_id = $row['order_id'];
+    $total_amount = $row['total_amount']; // Now correctly calculated
+    $transaction_id = $row['transaction_id'];
+    $transaction_date = $row['transaction_date'];
+    $transaction_time = $row['transaction_time'];
 
-                $email_body = "<h2>Your Payment Has Been Confirmed, $user_name!</h2>
-                   <p>We are pleased to inform you that your payment has been successfully verified by our team.</p>
-                   <p>Your order is now being processed and will be dispatched soon.</p>
-                   <p><strong>Order ID:</strong> $order_id</p>
-                   <p><strong>Transaction ID:</strong> $transaction_id</p>
-                   <p><strong>Amount Paid:</strong> ₹$sub_amount</p>
-                   <p><strong>Transaction Date:</strong> $transaction_date</p>
-                   <p><strong>Transaction Time:</strong> $transaction_time</p>
-                   <p><strong>Payment Status:</strong> <span style='color: green; font-weight: bold;'>Confirmed ✅</span></p>
-                   <p>We appreciate your trust in us! Your order will be shipped soon, and you will receive another email with tracking details.</p>
-                   <p>If you have any questions, feel free to <a href='http://localhost/NarayaniHandlooms/contact_us.php'>Contact Us</a>.</p><br>
-                   <p>To check your updated order status, <a href='http://localhost/NarayaniHandlooms/your_orders.php'>Click Here</a>.</p>";
+    // Prepare email body based on payment status
+    if ($payment_status == 'Completed') {
+        $subject = 'Payment Received';
+        $email_body = "<h2>Your Payment Has Been Confirmed, $user_name!</h2>
+                       <p>We are pleased to inform you that your payment has been successfully verified by our team.</p>
+                       <p>Your order is now being processed and will be dispatched soon.</p>
+                       <p><strong>Order ID:</strong> $order_id</p>
+                       <p><strong>Transaction ID:</strong> $transaction_id</p>
+                       <p><strong>Total Amount Paid:</strong> ₹$total_amount</p>
+                       <p><strong>Transaction Date:</strong> $transaction_date</p>
+                       <p><strong>Transaction Time:</strong> $transaction_time</p>
+                       <p><strong>Payment Status:</strong> <span style='color: green; font-weight: bold;'>Confirmed ✅</span></p>
+                       <p>We appreciate your trust in us! Your order will be shipped soon, and you will receive another email with tracking details.</p>
+                       <p>If you have any questions, feel free to <a href='http://localhost/NarayaniHandlooms/contact_us.php'>Contact Us</a>.</p><br>
+                       <p>To check your updated order status, <a href='http://localhost/NarayaniHandlooms/your_orders.php'>Click Here</a>.</p>";
+    } else { // Payment Failed
+        $subject = 'Payment Failed';
+        $email_body = "<h2>Hello, $user_name!</h2>
+                       <p>We regret to inform you that your payment could not be processed due to a failed transaction or incorrect payment details.</p>
+                       <p>Unfortunately, your order has not been placed.</p>
+                       <p><strong>Order ID:</strong> $order_id</p>
+                       <p><strong>Transaction ID:</strong> $transaction_id</p>
+                       <p><strong>Total Amount Attempted:</strong> ₹$total_amount</p>
+                       <p><strong>Transaction Date:</strong> $transaction_date</p>
+                       <p><strong>Transaction Time:</strong> $transaction_time</p>
+                       <p><strong>Payment Status:</strong> <span style='color: red; font-weight: bold;'>Failed ❌</span></p>
+                       <p>Please ensure that your payment details are correct and try again.</p>
+                       <p>To place your order again, go to <a href='http://localhost/NarayaniHandlooms/your_orders.php'>Your Orders</a> and click on 'Buy Again'.</p>
+                       <p>If you need any assistance, feel free to <a href='http://localhost/NarayaniHandlooms/contact_us.php'>Contact Us</a>.</p><br>
+                       <p>We apologize for the inconvenience and appreciate your patience.</p>";
+    }
 
-                $mail_sent = sendMail($user_email, 'Payment Confirmation', $email_body);
+    // Send email
+    $mail_sent = sendMail($user_email, $subject, $email_body);
 
-                if ($mail_sent === true) {
-                    echo "<script>
-                        alert('Payment confirmed! Mail sent to $user_name.');
-                        setTimeout(function() {
-                            window.location.href = 'admin_transactions.php';
-                        }, 100);
-                    </script>";
-                } else {
-                    echo "Email Error: " . $mail_sent;
-                }
-                exit();
-            }
+    if ($mail_sent === true) {
+        echo "<script>
+                alert('Payment status updated! Mail sent to $user_name.');
+                setTimeout(function() {
+                    window.location.href = 'admin_transactions.php';
+                }, 100);
+            </script>";
+    } else {
+        echo "Email Error: " . $mail_sent;
+    }
+    exit();
+}
         } else {
             echo "<script>
-                window.location.href='admin_transactions.php';
-            </script>";
+                    window.location.href='admin_transactions.php';
+                  </script>";
         }
         exit();
     }
