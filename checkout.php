@@ -1,5 +1,7 @@
 <?php
 session_start();
+
+$_SESSION['buy_again'] = true;
 $conn = mysqli_connect('localhost', 'root', '', 'narayani', 4306);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
@@ -30,7 +32,7 @@ if (isset($_GET['buy_again']) && $_GET['buy_again'] == 'true' && isset($_GET['or
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $result = $stmt->get_result();
-
+    echo "Buy Again block";
     $checkout_items = []; // Initialize array to store items
     $total_price = 0; // Initialize total price
 
@@ -43,6 +45,7 @@ if (isset($_GET['buy_again']) && $_GET['buy_again'] == 'true' && isset($_GET['or
             'bn_quantity' => $row['quantity']
         ];
         $total_price += $row['unit_price'] * $row['quantity'];
+        $_SESSION['buy_again'] = true;
     }
     $stmt->close();
 }
@@ -53,7 +56,7 @@ else if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-
+    echo "Buy Now block";
     if ($row = mysqli_fetch_assoc($result)) {
         $checkout_items[] = [
             'product_id' => $row['product_id'],
@@ -72,7 +75,7 @@ else if (isset($_SESSION['buy_now']) && $_SESSION['buy_now'] === 'clicked') {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
     $cart_result = mysqli_stmt_get_result($stmt);
-
+    echo "Cart block";
     while ($cart_row = mysqli_fetch_assoc($cart_result)) {
         $checkout_items[] = [
             'product_id' => $cart_row['product_id'],
