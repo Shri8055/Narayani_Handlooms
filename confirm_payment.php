@@ -140,18 +140,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h2>Confirm Your Payment</h2><hr><br>
     <p class="note-n">Please enter valid UPI transaction ID you received after payment.</p><br>
 
-    <form method="post">
-        <label for="">UPI transaction id:</label>
+    <form method="post" id="payment-form">
+        <label for="transaction_id">UPI transaction id:</label>
         <input type="text" id="transaction_id" name="transaction_id" placeholder="Enter UPI Transaction ID" required><br><br>
 
-        <label for="">Date of transaction:</label>
+        <label for="transaction_date">Date of transaction:</label>
         <input type="date" id="transaction_date" name="transaction_date" required><br><br>
         
-        <label for="">Exact Time of transaction:</label>
+        <label for="transaction_time">Exact Time of transaction:</label>
         <input type="time" id="transaction_time" name="transaction_time" required><br><br>
         
         <button type="submit">Confirm Payment</button>
         <!-- <p>Mail will be sent to you</p> -->
+        <p class="note-n">After clicking " Confirm Payment " please wait for pop-up.</p><br>
     </form>
 </div>
 </body>

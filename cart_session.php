@@ -9,7 +9,6 @@ if (!$conn) {
 }
 $total_price=0;
 $cart_items=[];
-var_dump($_GET);
 if (isset($_GET['buy_again']) || $_SESSION['buy_again'] == 'true' && isset($_GET['order_id'])) {
     $order_id = (int) $_GET['order_id']; // Ensure order_id is an integer
     // Fetch last order details
