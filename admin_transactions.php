@@ -18,7 +18,7 @@ function sendMail($to, $subject, $msg) {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'shrinivaskangralkar8055@gmail.com';
-        $mail->Password = 'vedt izue arff tcpp';
+        $mail->Password = 'ENTER APP PASS KEY';
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
         $mail->setFrom('shrinivaskangralkar8055@gmail.com', 'Narayani Handlooms');
