@@ -41,7 +41,7 @@
         error_log("Updating Order ID: " . $order_id); // Debugging: Check order ID
     
         // Prepare the UPDATE query for product count only if status is "In Transit"
-        if ($order_status == "In Transit") {
+        if ($order_status == "Delivered") {
             $update_products_query = "
                 UPDATE products p
                 JOIN order_items oi ON p.product_id = oi.product_id

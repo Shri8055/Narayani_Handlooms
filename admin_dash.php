@@ -37,7 +37,7 @@
             <li><a href="upload.php">Add product</a></li>
             <li>Add offers</li>
             <li><a href="orders.php">Orders<span class="cart-value"><?php echo $Orow['ototal'] ?? '0'; ?></span></a></li>
-            <li>Refunds inside orders(returned)<span class="cart-value">0</span></li>
+            <li>Refunds<span class="cart-value">0</span></li>
             <li><a href="admin_contact.php">Contact<span class="cart-value"><?php echo $Crow['ctotal'] ?? '0'; ?></span></a></li>
             <ol>
                 <li>

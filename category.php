@@ -53,7 +53,7 @@ if ($category === 'Bags') {
 } else if($category==='MenandWomen') {
     $query = "SELECT * FROM products WHERE genre IN ('Men Bags', 'Women Bags', 'Men Jewellery', 'Women Jewellery', 'Men & Women Jewellery', 'Men & Women Bags') ORDER BY RAND()";
 } else if($category==='Best Seller') {
-    $query = "SELECT * FROM products WHERE product_count>=3 ORDER BY RAND()";
+    $query = "SELECT * FROM products WHERE product_count>=2 ORDER BY RAND()";
 } else {
     $query = "SELECT * FROM products WHERE genre = '$category' ORDER BY RAND()";
 }
